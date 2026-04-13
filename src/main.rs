@@ -7,6 +7,7 @@ use twitch_irc::login::StaticLoginCredentials;
 use twitch_irc::message::ServerMessage;
 use crate::game::bully::GameData;
 use crate::game::events::ChaosEvents;
+use crate::game::mods::{health, location};
 use crate::settings::twitch_settings::TwitchSettings;
 
 mod windows;
@@ -70,7 +71,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             //info!("{:?}", memory::memory::read_float(game_data.handle, game_offsets::get_offset(game_data.handle, game_data.player_offset, game_offsets::PLAYER_HEALTH_OFFSET).unwrap()));
             //health::heal(&game_data);
             //ammo::give_all_ammo(&game_data);
-            //location::get_location(&game_data);
+            //location::fake_sky_tp(&game_data).await;
             //trouble_meter::max_trouble(&game_data).await;
             //input::phoon(&game_data).await;
         }

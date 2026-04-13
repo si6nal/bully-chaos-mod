@@ -40,6 +40,7 @@ pub enum ChaosEvents {
     HomeSweetHome, // teleport back to the dorms
     RandomTp, // teleports to random **pre-defined** coordinates of in-game locations | coordinates aren't pre-defined, too lazy to get list of coordinates
     SkyTp, // teleports the player into the sky
+    FakeSkyTp, // teleports the player into the sky & back onto the ground before dying
     HellTp, // teleports the player into the ground
 
     /* ============ */
@@ -49,6 +50,7 @@ pub enum ChaosEvents {
     RealCrash, // closes the game
 
     //Schizophrenia, // randomly presses movement keys & moves the mouse, 2-6sec input delay (30 sec)
+    // todo: try to implement opposite input as a memory mod, get difference between location every 5/10ms & apply distance in opposite direction
     //OppositeInput, // causes the player to move opposite of their key presses (send release & press+release messages) (30 sec)
     //CameraSpin, // sends mouse movement messages to rotate the camera (20 sec)
     //ConstantAttacking, // sends key presses to attack (15 sec)
@@ -79,6 +81,7 @@ impl ChaosEvents {
             ChaosEvents::HomeSweetHome  => "Home Sweet Home",
             ChaosEvents::RandomTp       => "Random TP",
             ChaosEvents::SkyTp          => "Sky TP (Suicide)",
+            ChaosEvents::FakeSkyTp      => "Fake Sky TP",
             ChaosEvents::HellTp         => "Mole POV (Suicide)",
             ChaosEvents::FakeCrash      => "Fake crash",
             ChaosEvents::RealCrash      => "Real crash",
@@ -118,6 +121,7 @@ impl ChaosEvents {
             ChaosEvents::HomeSweetHome => location::teleport_dorms(&data),
             ChaosEvents::RandomTp => location::random_tp(&data),
             ChaosEvents::SkyTp => location::sky_tp(&data),
+            ChaosEvents::FakeSkyTp => location::fake_sky_tp(&data).await,
             ChaosEvents::HellTp => location::hell_tp(&data),
             ChaosEvents::FakeCrash => processes::pause_process(data.process_id, 4).await,
             ChaosEvents::RealCrash => processes::terminate_process(data.handle),

@@ -1,5 +1,7 @@
 use std::time::{Duration, Instant};
+use log::debug;
 use crate::game::bully::GameData;
+use crate::game::mods::health;
 use crate::memory::coordinates_vector::CoordinatesVector;
 
 pub async fn sisyphus(data: &GameData) {
@@ -140,6 +142,61 @@ pub fn sky_tp(data: &GameData) {
 
     // update location
     CoordinatesVector::write(&data, current_location);
+}
+
+pub async fn fake_sky_tp(data: &GameData) {
+    // get current health (we will reset to it)
+    let original_health = health::get_health(&data);
+
+    // give an unreasonable amount of health to prevent dying
+    health::update_health(&data, 999999f32);
+
+    // get current location
+    let original_location = CoordinatesVector::read(&data);
+
+    // teleport to sky
+    sky_tp(&data);
+
+    loop {
+        // get current location
+        let current_location = CoordinatesVector::read(&data);
+
+        // check if we're back on the ground
+        if current_location.z as i32 <= original_location.z as i32 {
+            // wait for us to be fully on-ground (prevent accidental death)
+            tokio::time::sleep(Duration::from_millis(500)).await;
+
+            // reset health
+            match original_health {
+                Some(original_health) => health::update_health(&data, original_health),
+                None => health::heal(&data)
+            }
+
+            break;
+        }
+
+        // sleep
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+
+    /*// get current location
+    let mut original_location = CoordinatesVector::read(&data);
+    let original_z = original_location.z;
+
+    // add to vertical coordinate
+    original_location.z += 100f32;
+
+    // update location
+    CoordinatesVector::write(&data, original_location.clone());
+
+    // sleep for half a second
+    tokio::time::sleep(Duration::from_millis(500)).await;
+
+    // reset z coordinate
+    original_location.z = original_z;
+
+    // reset location
+    CoordinatesVector::write(&data, original_location);*/
 }
 
 pub fn hell_tp(data: &GameData) {

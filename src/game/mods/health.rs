@@ -49,7 +49,7 @@ pub fn suicide(data: &GameData) {
     update_health(&data, 0f32);
 }
 
-fn get_health(data: &GameData) -> Option<f32> {
+pub fn get_health(data: &GameData) -> Option<f32> {
     match game_offsets::get_offset(data.handle, data.player_offset, game_offsets::PLAYER_HEALTH_OFFSET) {
         Some(health_offset) => memory::read_float(data.handle, health_offset),
         None => {
@@ -79,7 +79,7 @@ fn get_max_health(data: &GameData) -> f32 {
     }
 }
 
-fn update_health(data: &GameData, health: f32) {
+pub fn update_health(data: &GameData, health: f32) {
     match game_offsets::get_offset(data.handle, data.player_offset, game_offsets::PLAYER_HEALTH_OFFSET) {
         Some(health_offset) => {
             if !memory::write_float(data.handle, health_offset, health) {
