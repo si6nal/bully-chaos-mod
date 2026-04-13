@@ -39,6 +39,7 @@ pub enum ChaosEvents {
 
     HomeSweetHome, // teleport back to the dorms
     RandomTp, // teleports to random **pre-defined** coordinates of in-game locations | coordinates aren't pre-defined, too lazy to get list of coordinates
+    FakeRandomTp, // teleports player back to original location after a random tp (5 sec delay)
     SkyTp, // teleports the player into the sky
     FakeSkyTp, // teleports the player into the sky & back onto the ground before dying
     HellTp, // teleports the player into the ground
@@ -80,6 +81,7 @@ impl ChaosEvents {
             ChaosEvents::Freeze         => "Freeze (10 seconds)",
             ChaosEvents::HomeSweetHome  => "Home Sweet Home",
             ChaosEvents::RandomTp       => "Random TP",
+            ChaosEvents::FakeRandomTp   => "Fake random TP",
             ChaosEvents::SkyTp          => "Sky TP (Suicide)",
             ChaosEvents::FakeSkyTp      => "Fake Sky TP",
             ChaosEvents::HellTp         => "Mole POV (Suicide)",
@@ -120,6 +122,7 @@ impl ChaosEvents {
             ChaosEvents::Freeze => location::freeze(&data).await,
             ChaosEvents::HomeSweetHome => location::teleport_dorms(&data),
             ChaosEvents::RandomTp => location::random_tp(&data),
+            ChaosEvents::FakeRandomTp => location::fake_random_tp(&data).await,
             ChaosEvents::SkyTp => location::sky_tp(&data),
             ChaosEvents::FakeSkyTp => location::fake_sky_tp(&data).await,
             ChaosEvents::HellTp => location::hell_tp(&data),

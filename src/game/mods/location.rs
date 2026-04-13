@@ -133,6 +133,20 @@ pub fn random_tp(data: &GameData) {
     CoordinatesVector::write(&data, random_coordinates);
 }
 
+pub async fn fake_random_tp(data: &GameData) {
+    // get current location
+    let original_location = CoordinatesVector::read(&data);
+
+    // teleport to random location
+    random_tp(&data);
+
+    // sleep for 5 seconds
+    tokio::time::sleep(Duration::from_secs(5)).await;
+
+    // teleport back to original location
+    CoordinatesVector::write(&data, original_location);
+}
+
 pub fn sky_tp(data: &GameData) {
     // get current location
     let mut current_location = CoordinatesVector::read(&data);
