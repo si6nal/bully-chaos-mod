@@ -3,7 +3,7 @@ use std::time::Duration;
 use log::{info, warn};
 use windows::Win32::Foundation::{CloseHandle, HANDLE, INVALID_HANDLE_VALUE};
 use windows::Win32::System::Diagnostics::ToolHelp::{CreateToolhelp32Snapshot, Module32First, Module32Next, Process32First, Process32Next, Thread32First, Thread32Next, MODULEENTRY32, PROCESSENTRY32, TH32CS_SNAPMODULE, TH32CS_SNAPMODULE32, TH32CS_SNAPPROCESS, TH32CS_SNAPTHREAD, THREADENTRY32};
-use windows::Win32::System::Threading::{OpenProcess, OpenThread, ResumeThread, SuspendThread, TerminateProcess, PROCESS_ALL_ACCESS, THREAD_ALL_ACCESS};
+use windows::Win32::System::Threading::{GetExitCodeProcess, OpenProcess, OpenThread, ResumeThread, SuspendThread, TerminateProcess, PROCESS_ALL_ACCESS, THREAD_ALL_ACCESS};
 
 pub fn get_process_id(target_executable_name: &str) -> Option<u32> {
     unsafe {
@@ -184,6 +184,19 @@ pub fn terminate_process(handle: HANDLE) {
         match TerminateProcess(handle, 0) {
             Ok(_) => info!("successfully terminated process"),
             Err(e) => warn!("failed to terminate process. error: {}", e)
+        }
+    }
+}
+
+pub fn is_process_active(handle: HANDLE) -> bool {
+    unsafe {
+        let mut exit_code = 0u32;
+        match GetExitCodeProcess(handle, &mut exit_code) {
+            Ok(_) => exit_code == 0x103_u32, // STILL_ACTIVE
+            Err(e) => {
+                warn!("failed to check if process is still active. error: {}", e);
+                false
+            }
         }
     }
 }

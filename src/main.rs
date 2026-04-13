@@ -9,6 +9,7 @@ use crate::game::bully::GameData;
 use crate::game::events::ChaosEvents;
 use crate::game::mods::{health, location};
 use crate::settings::twitch_settings::TwitchSettings;
+use crate::windows::processes;
 
 mod windows;
 mod game;
@@ -47,123 +48,135 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // join channel & send connection message
     client.join(twitch_settings.username.clone()).expect("failed to join channel.");
     client.say(twitch_settings.username.clone(), format!("[Bully Chaos Mod] Successfully connected. Enabled events: {}", ChaosEvents::iter().len())).await.expect("Failed to say connection message.");
-    
-    // get game data
-    let game_data = GameData::get().await;
 
-    // start chaos voting
+    // wrap getting game data in a loop, so if the game crashes this won't have to be re-opened
     loop {
-        // get chaos events
-        let events = ChaosEvents::get_events();
+        // get game data
+        let game_data = GameData::get().await;
 
-        // announce chaos events
-        let _ = client.say(twitch_settings.username.clone(), String::from("Chaos voting started...")).await;
-        for (idx, event) in events.iter().enumerate() {
-            let _ = client.say(twitch_settings.username.clone(), format!("{}. {}", idx + 1, event.as_str())).await;
-            tokio::time::sleep(Duration::from_millis(90)).await;
-        }
+        // start chaos voting
+        loop {
+            // get chaos events
+            let events = ChaosEvents::get_events();
 
-        // create hashmap for each chatter for storing votes
-        let mut votes: HashMap<String, u8> = HashMap::new();
+            // announce chaos events
+            let _ = client.say(twitch_settings.username.clone(), String::from("Chaos voting started...")).await;
+            for (idx, event) in events.iter().enumerate() {
+                let _ = client.say(twitch_settings.username.clone(), format!("{}. {}", idx + 1, event.as_str())).await;
+                tokio::time::sleep(Duration::from_millis(90)).await;
+            }
 
-        // testing
-        {
-            //info!("{:?}", memory::memory::read_float(game_data.handle, game_offsets::get_offset(game_data.handle, game_data.player_offset, game_offsets::PLAYER_HEALTH_OFFSET).unwrap()));
-            //health::heal(&game_data);
-            //ammo::give_all_ammo(&game_data);
-            //location::fake_sky_tp(&game_data).await;
-            //trouble_meter::max_trouble(&game_data).await;
-            //input::phoon(&game_data).await;
-        }
+            // create hashmap for each chatter for storing votes
+            let mut votes: HashMap<String, u8> = HashMap::new();
 
-        // sleep for voting period
-        tokio::time::sleep(voting_time).await;
+            // testing
+            {
+                //info!("{:?}", memory::memory::read_float(game_data.handle, game_offsets::get_offset(game_data.handle, game_data.player_offset, game_offsets::PLAYER_HEALTH_OFFSET).unwrap()));
+                //health::heal(&game_data);
+                //ammo::give_all_ammo(&game_data);
+                //location::fake_sky_tp(&game_data).await;
+                //trouble_meter::max_trouble(&game_data).await;
+                //input::phoon(&game_data).await;
+            }
 
-        // read messages since last read period
-        while let Ok(msg) = incoming_messages.try_recv() {
-            // handle messages
-            match msg {
-                ServerMessage::Privmsg(msg) => {
-                    // get message text
-                    let msg_txt = msg.message_text;
+            // sleep for voting period
+            tokio::time::sleep(voting_time).await;
 
-                    // check if message is a voting option
-                    if msg_txt.len() == 1 {
-                        // convert message to u8
-                        if let Ok(vote_option) = msg_txt.parse::<u8>() {
-                            // make sure the vote option exists
-                            if vote_option > 0 && vote_option <= 4 {
-                                // add or update sender's vote option
-                                *votes.entry(msg.sender.login).or_insert(vote_option) = vote_option;
+            // read messages since last read period
+            while let Ok(msg) = incoming_messages.try_recv() {
+                // handle messages
+                match msg {
+                    ServerMessage::Privmsg(msg) => {
+                        // get message text
+                        let msg_txt = msg.message_text;
+
+                        // check if message is a voting option
+                        if msg_txt.len() == 1 {
+                            // convert message to u8
+                            if let Ok(vote_option) = msg_txt.parse::<u8>() {
+                                // make sure the vote option exists
+                                if vote_option > 0 && vote_option <= 4 {
+                                    // add or update sender's vote option
+                                    *votes.entry(msg.sender.login).or_insert(vote_option) = vote_option;
+                                }
                             }
                         }
-                    }
-                },
-                _ => { } // ignore messages that aren't chat messages
-            }
-        }
-
-        // check if votes is empty, if so just choose a random event
-        let (event, event_votes): (ChaosEvents, Option<usize>) = if votes.is_empty() {
-            info!("choosing random event, no votes were cast.");
-            match events.get(rand::random_range(0..3)) {
-                Some(event) => (event.clone(), None),
-                None => (ChaosEvents::Nothing, None)
-            }
-        } else {
-            // create hashmap for event vote counting
-            let mut vote_counts: HashMap<u8, usize> = HashMap::new();
-
-            // count votes
-            for (_, vote) in votes {
-                // add vote or increment
-                *vote_counts.entry(vote).or_insert(1) += 1;
-            }
-
-            // get event with the highest votes
-            match vote_counts.iter().max_by_key(|&(_, v)| v).map(|(&k, _)| k) {
-                Some(event_winner) => {
-                    // get event
-                    match events.get((event_winner as usize - 1).max(0)) {
-                        Some(event) => {
-                            info!("selected event: {}", event.as_str());
-
-                            // get votes for event
-                            match vote_counts.get(&event_winner) {
-                                Some(votes) => (event.clone(), Some(*votes)),
-                                None => (event.clone(), None)
-                            }
-                        },
-                        None => {
-                            warn!("failed to select event: {}", event_winner);
-                            (ChaosEvents::Nothing, None)
-                        }
-                    }
-                },
-                None => {
-                    warn!("failed to get the event with the highest votes.");
-                    (ChaosEvents::Nothing, None)
+                    },
+                    _ => {} // ignore messages that aren't chat messages
                 }
             }
-        };
 
-        // apply crash events before message
-        if event == ChaosEvents::FakeCrash || event == ChaosEvents::RealCrash {
-            info!("executing crash event...");
-            event.execute(&game_data).await;
+            // check if votes is empty, if so just choose a random event
+            let (event, event_votes): (ChaosEvents, Option<usize>) = if votes.is_empty() {
+                info!("choosing random event, no votes were cast.");
+                match events.get(rand::random_range(0..3)) {
+                    Some(event) => (event.clone(), None),
+                    None => (ChaosEvents::Nothing, None)
+                }
+            } else {
+                // create hashmap for event vote counting
+                let mut vote_counts: HashMap<u8, usize> = HashMap::new();
+
+                // count votes
+                for (_, vote) in votes {
+                    // add vote or increment
+                    *vote_counts.entry(vote).or_insert(1) += 1;
+                }
+
+                // get event with the highest votes
+                match vote_counts.iter().max_by_key(|&(_, v)| v).map(|(&k, _)| k) {
+                    Some(event_winner) => {
+                        // get event
+                        match events.get((event_winner as usize - 1).max(0)) {
+                            Some(event) => {
+                                info!("selected event: {}", event.as_str());
+
+                                // get votes for event
+                                match vote_counts.get(&event_winner) {
+                                    Some(votes) => (event.clone(), Some(*votes)),
+                                    None => (event.clone(), None)
+                                }
+                            },
+                            None => {
+                                warn!("failed to select event: {}", event_winner);
+                                (ChaosEvents::Nothing, None)
+                            }
+                        }
+                    },
+                    None => {
+                        warn!("failed to get the event with the highest votes.");
+                        (ChaosEvents::Nothing, None)
+                    }
+                }
+            };
+
+            // check if game is still running before applying event
+            if !processes::is_process_active(game_data.handle) {
+                break;
+            }
+
+            // apply crash events before message
+            if event == ChaosEvents::FakeCrash || event == ChaosEvents::RealCrash {
+                info!("executing crash event...");
+                event.execute(&game_data).await;
+            }
+
+            // send message of selected event
+            let event_msg = match event_votes {
+                Some(event_vote_count) => format!("Chosen event: {} ({} votes)", event.as_str(), event_vote_count),
+                None => format!("Chosen event: {}", event.as_str()),
+            };
+            info!("{}", event_msg);
+            let _ = client.say(twitch_settings.username.clone(), event_msg).await;
+
+            // apply other events
+            if event != ChaosEvents::FakeCrash && event != ChaosEvents::RealCrash {
+                event.execute(&game_data).await;
+            }
         }
 
-        // send message of selected event
-        let event_msg = match event_votes {
-            Some(event_vote_count) => format!("Chosen event: {} ({} votes)", event.as_str(), event_vote_count),
-            None => format!("Chosen event: {}", event.as_str()),
-        };
-        info!("{}", event_msg);
-        let _ = client.say(twitch_settings.username.clone(), event_msg).await;
-
-        // apply other events
-        if event != ChaosEvents::FakeCrash && event != ChaosEvents::RealCrash {
-            event.execute(&game_data).await;
-        }
+        // warn that chaos loop exited
+        warn!("Bully game handle closed.");
+        let _ = client.say(twitch_settings.username.clone(), String::from("Bully game handle closed, voting paused.")).await;
     }
 }
