@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::time::Duration;
-use log::{info, warn};
+use log::{error, info, warn};
 use strum::IntoEnumIterator;
 use twitch_irc::{ClientConfig, SecureTCPTransport, TwitchIRCClient};
 use twitch_irc::login::StaticLoginCredentials;
@@ -24,6 +24,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // load twitch settings
     let twitch_settings = TwitchSettings::get().expect("update twitch settings file.");
     let voting_time = Duration::from_secs(twitch_settings.voting_time);
+
+    // verify length of oauth token
+    if twitch_settings.oauth_token.len() != 30 {
+        error!("invalid oauth token length, the oauth token length must be 30.");
+        return Ok(());
+    }
 
     // create twitch config
     // https://twitchtokengenerator.com/
