@@ -1,5 +1,6 @@
 use std::collections::HashMap;
-use std::time::Duration;
+use std::ops::Div;
+use std::time::{Duration, Instant};
 use log::{error, info, warn};
 use strum::IntoEnumIterator;
 use twitch_irc::{ClientConfig, SecureTCPTransport, TwitchIRCClient};
@@ -7,7 +8,7 @@ use twitch_irc::login::StaticLoginCredentials;
 use twitch_irc::message::ServerMessage;
 use crate::game::bully::GameData;
 use crate::game::events::ChaosEvents;
-use crate::game::mods::{health, location};
+use crate::settings::event_settings::EventSettings;
 use crate::settings::twitch_settings::TwitchSettings;
 use crate::windows::processes;
 
@@ -20,6 +21,9 @@ mod settings;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // initialize logger
     env_logger::builder().filter_level(log::LevelFilter::Debug).init();
+
+    // load event settings
+    let event_settings = EventSettings::get();
 
     // load twitch settings
     let twitch_settings = TwitchSettings::get().expect("update twitch settings file.");
@@ -41,16 +45,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
     let (mut incoming_messages, client) = TwitchIRCClient::<SecureTCPTransport, StaticLoginCredentials>::new(cfg);
 
-    /*// create channel for incoming messages
-    let (tx_messages, mut rx_messages): (UnboundedSender<ServerMessage>, UnboundedReceiver<ServerMessage>) = mpsc::unbounded_channel();
-
-    // create task that consumes messages & sends them to the local sender & receiver channels
-    tokio::spawn(async move {
-        while let Some(message) = incoming_messages.recv().await {
-            let _ = tx_messages.send(message);
-        }
-    });*/
-
     // join channel & send connection message
     client.join(twitch_settings.username.clone()).expect("failed to join channel.");
     client.say(twitch_settings.username.clone(), format!(
@@ -64,12 +58,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         // get game data
         let game_data = GameData::get().await;
 
+        // counter for how many events have been executed
+        let mut event_counter: u32 = 0;
+
+        // time for when reduced voting timer started
+        let mut reduced_voting_timer_start: Option<Instant> = None;
+
         // start chaos voting
-        // todo: (meta) no chaos 1 minute every x(30) events
-        // todo: (meta) reduced voting timer for 1 minute every x(50) events
         loop {
             // get chaos events
             let events = ChaosEvents::get_events();
+
+            // pause voting
+            if event_counter > 0 && event_counter % event_settings.meta_no_chaos_roo == 0 {
+                let _ = client.say(twitch_settings.username.clone(), String::from("Voting disabled for 1 minute (meta).")).await;
+                tokio::time::sleep(Duration::from_secs(60)).await;
+            }
 
             // announce chaos events
             let _ = client.say(twitch_settings.username.clone(), String::from("Chaos voting started...")).await;
@@ -82,7 +86,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let mut votes: HashMap<String, u8> = HashMap::new();
 
             /* testing */ {
-                //info!("{:?}", memory::memory::read_float(game_data.handle, game_offsets::get_offset(game_data.handle, game_data.player_offset, game_offsets::PLAYER_HEALTH_OFFSET).unwrap()));
                 //health::heal(&game_data);
                 //ammo::give_all_ammo(&game_data);
                 //location::fake_sky_tp(&game_data).await;
@@ -90,8 +93,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 //input::phoon(&game_data).await;
             }
 
-            // sleep for voting period
-            tokio::time::sleep(voting_time).await;
+            // check if we should apply the reduced voting timer
+            if event_counter > 0 && event_counter % event_settings.meta_extra_chaos_roo == 0 {
+                reduced_voting_timer_start = Some(Instant::now());
+                let _ = client.say(twitch_settings.username.clone(), String::from("More chaos enabled for 1 minute (meta).")).await;
+            }
+
+            // sleep for voting period, account for meta time modifier
+            let adjusted_voting_time = if let Some(timer_start) = reduced_voting_timer_start {
+                // check if we should disable the reduced timer
+                if timer_start.elapsed().as_secs() >= 60 {
+                    reduced_voting_timer_start = None;
+                    let _ = client.say(twitch_settings.username.clone(), String::from("More chaos disabled.")).await;
+                }
+
+                voting_time.div(2)
+            } else {
+                voting_time
+            };
+            tokio::time::sleep(adjusted_voting_time).await;
 
             // read messages since last read period
             while let Ok(msg) = incoming_messages.try_recv() {
@@ -192,6 +212,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             if event != ChaosEvents::FakeCrash && event != ChaosEvents::RealCrash {
                 event.execute(&game_data).await;
             }
+
+            // increment event counter
+            event_counter += 1;
         }
 
         // warn that chaos loop exited

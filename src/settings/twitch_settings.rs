@@ -32,7 +32,6 @@ impl TwitchSettings {
 
     fn load() -> TwitchSettings {
         let cfg_contents = fs::read_to_string("./twitch_settings.toml").expect("failed to read twitch settings");
-        let cfg: TwitchSettings = toml::from_str(&cfg_contents).expect("failed to deserialize twitch settings");
-        cfg
+        toml::from_str(&cfg_contents).expect("failed to deserialize twitch settings")
     }
 }
