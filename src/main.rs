@@ -164,8 +164,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             // apply crash events before message
             if event == ChaosEvents::FakeCrash || event == ChaosEvents::RealCrash {
+                // execute crash event
                 info!("executing crash event...");
                 event.execute(&game_data).await;
+
+                // break from game loop if it was a real crash event, this prevents an extra voting phase beginning
+                if event == ChaosEvents::RealCrash {
+                    break;
+                }
             }
 
             // send message of selected event
