@@ -141,6 +141,7 @@ pub async fn fake_random_tp(data: &GameData) {
     random_tp(&data);
 
     // sleep for 5 seconds
+    // todo: give invincibility for the 5 seconds
     tokio::time::sleep(Duration::from_secs(5)).await;
 
     // teleport back to original location
