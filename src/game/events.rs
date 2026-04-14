@@ -8,7 +8,8 @@ use crate::game::mods::{ammo, health, location, money, trouble_meter};
 use crate::windows::processes;
 
 // events that are commented out aren't implemented
-#[derive(EnumIter, Clone, PartialEq)]
+// todo: add weight to events
+#[derive(EnumIter, Clone, PartialEq, Debug)]
 pub enum ChaosEvents {
     Nothing, // does nothing (skips vote)
     Nothing1Min, // does nothing for 1 minute
@@ -43,6 +44,7 @@ pub enum ChaosEvents {
     SkyTp, // teleports the player into the sky
     FakeSkyTp, // teleports the player into the sky & back onto the ground before dying
     HellTp, // teleports the player into the ground
+    //Bus, // teleports to bus stop & gets on bus
 
     /* ============ */
     /* WINDOWS MODS */
@@ -97,11 +99,13 @@ impl ChaosEvents {
             ChaosEvents::Nothing1Min => tokio::time::sleep(Duration::from_secs(60)).await,
             ChaosEvents::RandomEvent => {
                 loop {
+                    // todo: replace with new rand vec function, create vec & remove self from it
                     let next_event = Self::rand();
                     if next_event == ChaosEvents::RandomEvent {
                         continue;
                     }
 
+                    // todo: say/log selected random event
                     Box::pin(next_event.execute(&data)).await;
                     break;
                 }
@@ -127,7 +131,7 @@ impl ChaosEvents {
             ChaosEvents::FakeSkyTp => location::fake_sky_tp(&data).await,
             ChaosEvents::HellTp => location::hell_tp(&data),
             ChaosEvents::FakeCrash => processes::pause_process(data.process_id, 4).await,
-            ChaosEvents::RealCrash => processes::terminate_process(data.handle),
+            ChaosEvents::RealCrash => processes::terminate_process(data.handle), // todo: pause process like fake crash before terminating
             //ChaosEvents::Phoon => input::phoon(&data).await,
         }
     }
@@ -137,7 +141,37 @@ impl ChaosEvents {
         ChaosEvents::iter().choose(&mut rng).unwrap_or(ChaosEvents::Nothing)
     }
 
+    pub fn rand_vec(events: &Vec<ChaosEvents>) -> ChaosEvents {
+        let mut rng = rand::rng();
+        events.iter().choose(&mut rng).unwrap().clone()
+    }
+
     pub fn get_events() -> Vec<ChaosEvents> {
-        vec![ChaosEvents::rand(), ChaosEvents::rand(), ChaosEvents::rand(), ChaosEvents::RandomEvent]
+        // get all event options
+        let mut events = ChaosEvents::iter().collect::<Vec<ChaosEvents>>();
+
+        // remove random event option (we always add this as an option)
+        events.retain(|e| *e != ChaosEvents::RandomEvent);
+
+        // create vec for selected events
+        let mut chaos_events: Vec<ChaosEvents> = Vec::new();
+
+        // add 3 unique random events
+        for _ in 0..3 {
+            // get random event
+            let event = ChaosEvents::rand_vec(&events);
+
+            // add random event
+            chaos_events.push(event.clone());
+
+            // remove event from vec
+            events.retain(|e| *e != event);
+        }
+
+        // add random event
+        chaos_events.push(ChaosEvents::RandomEvent);
+
+        // return events
+        chaos_events
     }
 }

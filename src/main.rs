@@ -53,7 +53,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // join channel & send connection message
     client.join(twitch_settings.username.clone()).expect("failed to join channel.");
-    client.say(twitch_settings.username.clone(), format!("[Bully Chaos Mod] Successfully connected. Enabled events: {}", ChaosEvents::iter().len())).await.expect("Failed to say connection message.");
+    client.say(twitch_settings.username.clone(), format!("[Bully Chaos Mod] Successfully connected. Enabled events: {}", ChaosEvents::iter().len())).await.expect("Failed to say connection message."); // todo: add version
 
     // wrap getting game data in a loop, so if the game crashes this won't have to be re-opened
     loop {
