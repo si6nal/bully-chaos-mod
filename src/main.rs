@@ -90,7 +90,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 //ammo::give_all_ammo(&game_data);
                 //location::fake_sky_tp(&game_data).await;
                 //trouble_meter::max_trouble(&game_data).await;
-                //input::phoon(&game_data).await;
             }
 
             // check if we should apply the reduced voting timer

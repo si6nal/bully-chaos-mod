@@ -1,5 +1,4 @@
 use std::time::{Duration, Instant};
-use log::debug;
 use crate::game::bully::GameData;
 use crate::game::mods::health;
 use crate::memory::coordinates_vector::CoordinatesVector;

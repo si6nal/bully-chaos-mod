@@ -31,6 +31,7 @@ impl GameData {
         info!("bully pid: {}", bully_pid);
 
         // get window handle for bully
+        // todo: if this isn't removed, fix the occasional crash
         let window_handle = window::get_window_handle("Bully").expect("failed to get window handle for bully.");
         info!("window handle: {:?}", window_handle);
 
