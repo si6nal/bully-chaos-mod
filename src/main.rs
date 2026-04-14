@@ -113,6 +113,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
 
+            // todo: sleep while game isn't focused
+
             // check if votes is empty, if so just choose a random event
             let (event, event_votes): (ChaosEvents, Option<usize>) = if votes.is_empty() {
                 info!("choosing random event, no votes were cast.");
