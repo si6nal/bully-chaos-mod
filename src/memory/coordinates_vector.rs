@@ -77,7 +77,7 @@ impl CoordinatesVector {
 
     fn read_coordinate(data: &GameData, padding: usize) -> Option<f32> {
         match game_offsets::get_offset(data.handle, data.player_coordinates_offset, game_offsets::PLAYER_COORDINATES_OFFSET + padding) {
-            Some(coord_offset) => return memory::read_float(data.handle, coord_offset),
+            Some(coord_offset) => return memory::read::<f32>(data.handle, coord_offset),
             None => warn!("[r] failed to get player coordinate offset with {} padding.", padding)
         }
 
@@ -87,7 +87,7 @@ impl CoordinatesVector {
     fn write_coordinate(data: &GameData, padding: usize, pos: f32) {
         match game_offsets::get_offset(data.handle, data.player_coordinates_offset, game_offsets::PLAYER_COORDINATES_OFFSET + padding) {
             Some(coord_offset) => {
-                if !memory::write_float(data.handle, coord_offset, pos) {
+                if !memory::write::<f32>(data.handle, coord_offset, pos) {
                     warn!("failed to write player coordinate");
                 }
             },

@@ -26,7 +26,7 @@ pub fn remove_trouble(data: &GameData) {
 fn update_trouble(data: &GameData, wanted_level: i32) {
     match game_offsets::get_offset(data.handle, data.player_offset, game_offsets::PLAYER_WANTED_LEVEL_OFFSET) {
         Some(wanted_level_offset) => {
-            if !memory::write_int(data.handle, wanted_level_offset, wanted_level) {
+            if !memory::write::<i32>(data.handle, wanted_level_offset, wanted_level) {
                 warn!("failed to update wanted level.");
             }
         },

@@ -10,7 +10,7 @@ pub fn get_player_coordinates_offset(base_addr: usize) -> usize {
 }
 
 pub fn get_offset(game: HANDLE, base_offset: usize, data_offset: usize) -> Option<usize> {
-    match memory::read_usize(game, base_offset) {
+    match memory::read::<usize>(game, base_offset) {
         Some(addr) => Some(addr + data_offset),
         None => None
     }

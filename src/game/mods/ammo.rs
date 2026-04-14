@@ -21,7 +21,7 @@ pub fn give_all_ammo(data: &GameData) {
 fn update_ammo(data: &GameData, ammo: f32, ammo_addr: usize) {
     match game_offsets::get_offset(data.handle, data.player_offset, ammo_addr) {
         Some(ammo_offset) => {
-            if !memory::write_float(data.handle, ammo_offset, ammo) {
+            if !memory::write::<f32>(data.handle, ammo_offset, ammo) {
                 warn!("failed to update ammo. offset: {}", ammo_offset);
             }
         },

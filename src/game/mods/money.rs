@@ -13,7 +13,7 @@ pub fn give_max_money(data: &GameData) {
 fn update_money(data: &GameData, money: i32) {
     match game_offsets::get_offset(data.handle, data.player_offset, game_offsets::PLAYER_MONEY_OFFSET) {
         Some(money_offset) => {
-            if !memory::write_int(data.handle, money_offset, money) {
+            if !memory::write::<i32>(data.handle, money_offset, money) {
                 warn!("failed to update money.");
             }
         },

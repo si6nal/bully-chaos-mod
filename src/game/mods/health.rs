@@ -51,7 +51,7 @@ pub fn suicide(data: &GameData) {
 
 pub fn get_health(data: &GameData) -> Option<f32> {
     match game_offsets::get_offset(data.handle, data.player_offset, game_offsets::PLAYER_HEALTH_OFFSET) {
-        Some(health_offset) => memory::read_float(data.handle, health_offset),
+        Some(health_offset) => memory::read::<f32>(data.handle, health_offset),
         None => {
             warn!("failed to get health offset.");
             None
@@ -63,7 +63,7 @@ fn get_max_health(data: &GameData) -> f32 {
     match game_offsets::get_offset(data.handle, data.player_offset, game_offsets::PLAYER_MAX_HEALTH_OFFSET) {
         Some(max_health_offset) => {
             // read max health value
-            match memory::read_float(data.handle, max_health_offset) {
+            match memory::read::<f32>(data.handle, max_health_offset) {
                 Some(max_health) => {
                     // check if the read failed
                     if max_health <= 0f32 {
@@ -82,7 +82,7 @@ fn get_max_health(data: &GameData) -> f32 {
 pub fn update_health(data: &GameData, health: f32) {
     match game_offsets::get_offset(data.handle, data.player_offset, game_offsets::PLAYER_HEALTH_OFFSET) {
         Some(health_offset) => {
-            if !memory::write_float(data.handle, health_offset, health) {
+            if !memory::write::<f32>(data.handle, health_offset, health) {
                 warn!("failed to update health.");
             }
         },
