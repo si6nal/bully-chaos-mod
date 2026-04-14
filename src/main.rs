@@ -133,7 +133,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                                 // get votes for event
                                 match vote_counts.get(&event_winner) {
-                                    Some(votes) => (event.clone(), Some(*votes)),
+                                    Some(votes) => (event.clone(), Some(*votes - 1)),
                                     None => (event.clone(), None)
                                 }
                             },
