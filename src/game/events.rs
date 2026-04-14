@@ -138,6 +138,6 @@ impl ChaosEvents {
     }
 
     pub fn get_events() -> Vec<ChaosEvents> {
-        vec![ChaosEvents::rand(), ChaosEvents::rand(), ChaosEvents::rand(), ChaosEvents::rand()]
+        vec![ChaosEvents::rand(), ChaosEvents::rand(), ChaosEvents::rand(), ChaosEvents::RandomEvent]
     }
 }
