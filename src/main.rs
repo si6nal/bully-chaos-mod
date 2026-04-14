@@ -55,6 +55,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let game_data = GameData::get().await;
 
         // start chaos voting
+        // todo: (meta) no chaos 1 minute every x(30) events
+        // todo: (meta) reduced voting timer for 1 minute every x(50) events
         loop {
             // get chaos events
             let events = ChaosEvents::get_events();
@@ -69,8 +71,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             // create hashmap for each chatter for storing votes
             let mut votes: HashMap<String, u8> = HashMap::new();
 
-            // testing
-            {
+            /* testing */ {
                 //info!("{:?}", memory::memory::read_float(game_data.handle, game_offsets::get_offset(game_data.handle, game_data.player_offset, game_offsets::PLAYER_HEALTH_OFFSET).unwrap()));
                 //health::heal(&game_data);
                 //ammo::give_all_ammo(&game_data);
