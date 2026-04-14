@@ -115,7 +115,7 @@ pub async fn freeze(data: &GameData) {
 }
 
 pub fn teleport_dorms(data: &GameData) {
-    CoordinatesVector::write(&data, CoordinatesVector { x: 271.06076, y: -115.08667, z: 6.1845984 });
+    CoordinatesVector::write(&data, CoordinatesVector { x: 271.06076, y: -115.08667, z: /*6*/11.1845984 });
 }
 
 pub fn random_tp(data: &GameData) {
