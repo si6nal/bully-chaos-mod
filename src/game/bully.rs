@@ -31,8 +31,20 @@ impl GameData {
         info!("bully pid: {}", bully_pid);
 
         // get window handle for bully
-        // todo: if this isn't removed, fix the occasional crash
-        let window_handle = window::get_window_handle("Bully").expect("failed to get window handle for bully.");
+        let window_handle: HWND;
+        loop {
+            match window::get_window_handle("Bully") {
+                Some(bully_hwnd) => {
+                    window_handle = bully_hwnd;
+                    break;
+                },
+                None => {
+                    tokio::time::sleep(std::time::Duration::from_millis(1000)).await;
+                    info!("failed to get window handle, sleeping...");
+                },
+            }
+        }
+
         info!("window handle: {:?}", window_handle);
 
         // get module address of the executable
