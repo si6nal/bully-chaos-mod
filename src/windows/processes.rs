@@ -86,7 +86,7 @@ pub fn get_module_address(process_id: u32, target_module_name: &str) -> Option<u
                     let module_name = CStr::from_ptr(module_entry.szModule.as_ptr()).to_string_lossy().to_string();
 
                     // check if it is the module we're looking for
-                    if module_name.eq(target_module_name) {
+                    if module_name.eq_ignore_ascii_case(target_module_name) {
                         let _ = CloseHandle(snapshot);
                         return Some(module_entry.modBaseAddr as usize);
                     }

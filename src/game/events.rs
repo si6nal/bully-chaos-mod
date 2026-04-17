@@ -61,6 +61,7 @@ pub enum ChaosEvents {
     //ConstantAttacking, // sends key presses to attack (15 sec)
     //Phoon, // sends key presses to jump (15 sec)
     //TakeYourMeds, // mutes the game (15 sec)
+    //RandomPicture, // choose a random picture to render in-game from a pictures folder alongside the exe, maybe make the image bounce around the screen
 }
 
 impl ChaosEvents {

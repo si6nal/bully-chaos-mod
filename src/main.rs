@@ -10,7 +10,7 @@ use crate::game::bully::GameData;
 use crate::game::events::{ChaosEvents, TwitchClientData};
 use crate::settings::event_settings::EventSettings;
 use crate::settings::twitch_settings::TwitchSettings;
-use crate::windows::processes;
+use crate::windows::{injection, processes};
 
 mod windows;
 mod game;
@@ -63,6 +63,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     loop {
         // get game data
         let game_data = GameData::get().await;
+
+        // load bully-chaos-lib
+        if !injection::load_library(game_data.handle, game_data.process_id, injection::get_full_dll_path("bully-chaos-lib.dll")) {
+            warn!("failed to load bully-chaos-lib.");
+            tokio::time::sleep(Duration::from_secs(10)).await;
+            continue;
+        }
 
         // counter for how many events have been executed
         let mut event_counter: u32 = 0;
