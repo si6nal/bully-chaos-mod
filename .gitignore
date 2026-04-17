@@ -21,3 +21,4 @@ target/
 
 # chaos mod files
 twitch_settings.toml
+event_settings.toml
