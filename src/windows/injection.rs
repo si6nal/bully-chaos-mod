@@ -65,21 +65,21 @@ pub fn load_library(handle: HANDLE, process_id: u32, dll_path: String) -> bool {
                                 WaitForSingleObject(thread_handle, INFINITE);
 
                                 // get thread exit code
-                                let mut thread_exit_code: u32 = 0;
+                                /*let mut thread_exit_code: u32 = 0;
                                 let mut thread_success_exit = true; // assume the thread will exit successfully
                                 if let Ok(_) = GetExitCodeThread(thread_handle, &mut thread_exit_code) {
                                     // check if the thread exit code is 0, if it is then the thread failed to execute
                                     if thread_exit_code == 0 {
                                         thread_success_exit = false;
                                     }
-                                }
+                                }*/
 
                                 // close thread handle
                                 let _ = CloseHandle(thread_handle);
 
                                 // assume the library was loaded
                                 info!("successfully loaded dll: {}", dll_path);
-                                thread_success_exit
+                                true//thread_success_exit
                             },
                             Err(e) => {
                                 warn!("failed to create remote thread. error: {}", e);

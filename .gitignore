@@ -102,3 +102,9 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# visual studio cache
+*/.vs/*
+
+# intermediate build files
+bully-chaos-lib/output/*
