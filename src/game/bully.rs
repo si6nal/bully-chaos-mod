@@ -45,6 +45,8 @@ impl GameData {
             }
         }
 
+        // todo: wait for game to initialize (fix crash)
+
         info!("window handle: {:?}", window_handle);
 
         // get module address of the executable

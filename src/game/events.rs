@@ -3,6 +3,8 @@ use log::info;
 use rand::prelude::IteratorRandom;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
+use twitch_irc::{SecureTCPTransport, TwitchIRCClient};
+use twitch_irc::login::StaticLoginCredentials;
 use crate::game::bully::GameData;
 use crate::game::mods::{ammo, health, location, money, trouble_meter};
 use crate::windows::processes;
@@ -93,21 +95,26 @@ impl ChaosEvents {
         }
     }
 
-    pub async fn execute(&self, data: &GameData) {
+    pub async fn execute(&self, data: &GameData, twitch_client_data: Option<&TwitchClientData>) {
         match self {
             ChaosEvents::Nothing => info!("nothing (event)"),
             ChaosEvents::Nothing1Min => tokio::time::sleep(Duration::from_secs(60)).await,
             ChaosEvents::RandomEvent => {
-                loop {
-                    // todo: replace with new rand vec function, create vec & remove self from it
-                    let next_event = Self::rand();
-                    if next_event == ChaosEvents::RandomEvent {
-                        continue;
-                    }
+                // get all event options
+                let mut events = ChaosEvents::iter().collect::<Vec<ChaosEvents>>();
 
-                    // todo: say/log selected random event
-                    Box::pin(next_event.execute(&data)).await;
-                    break;
+                // remove random event option
+                events.retain(|e| *e != ChaosEvents::RandomEvent);
+
+                // get random event
+                let event = ChaosEvents::rand_vec(&events);
+
+                // execute random event
+                Box::pin(event.execute(&data, None)).await;
+
+                // send message for the random event
+                if let Some(twitch_client_data) = twitch_client_data {
+                    let _ = twitch_client_data.irc_client.say(twitch_client_data.channel.clone(), format!("Random event: {}", event.as_str())).await;
                 }
             },
             ChaosEvents::RemoveMoney => money::remove_money(&data),
@@ -174,4 +181,9 @@ impl ChaosEvents {
         // return events
         chaos_events
     }
+}
+
+pub struct TwitchClientData {
+    pub irc_client: TwitchIRCClient<SecureTCPTransport, StaticLoginCredentials>,
+    pub channel: String,
 }

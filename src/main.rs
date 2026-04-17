@@ -7,7 +7,7 @@ use twitch_irc::{ClientConfig, SecureTCPTransport, TwitchIRCClient};
 use twitch_irc::login::StaticLoginCredentials;
 use twitch_irc::message::ServerMessage;
 use crate::game::bully::GameData;
-use crate::game::events::ChaosEvents;
+use crate::game::events::{ChaosEvents, TwitchClientData};
 use crate::settings::event_settings::EventSettings;
 use crate::settings::twitch_settings::TwitchSettings;
 use crate::windows::processes;
@@ -44,6 +44,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
     );
     let (mut incoming_messages, client) = TwitchIRCClient::<SecureTCPTransport, StaticLoginCredentials>::new(cfg);
+
+    // create twitch client data struct for events
+    let twitch_client_data = TwitchClientData {
+        irc_client: client.clone(),
+        channel: twitch_settings.username.clone(),
+    };
 
     // join channel & send connection message
     client.join(twitch_settings.username.clone()).expect("failed to join channel.");
@@ -123,6 +129,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         // check if message is a voting option
                         if msg_txt.len() == 1 {
                             // convert message to u8
+                            // todo: get first character & parse that, allows for emotes
                             if let Ok(vote_option) = msg_txt.parse::<u8>() {
                                 // make sure the vote option exists
                                 if vote_option > 0 && vote_option <= 4 {
@@ -191,7 +198,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             if event == ChaosEvents::FakeCrash || event == ChaosEvents::RealCrash {
                 // execute crash event
                 info!("executing crash event...");
-                event.execute(&game_data).await;
+                event.execute(&game_data, None).await;
 
                 // break from game loop if it was a real crash event, this prevents an extra voting phase beginning
                 if event == ChaosEvents::RealCrash {
@@ -209,7 +216,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             // apply other events
             if event != ChaosEvents::FakeCrash && event != ChaosEvents::RealCrash {
-                event.execute(&game_data).await;
+                event.execute(&game_data, Some(&twitch_client_data)).await;
             }
 
             // increment event counter
