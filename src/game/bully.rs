@@ -45,8 +45,6 @@ impl GameData {
             }
         }
 
-        // todo: wait for game to initialize (fix crash)
-
         // get module address of the executable
         let base_addr: usize;
         loop {
