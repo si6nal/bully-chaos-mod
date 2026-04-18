@@ -97,6 +97,11 @@ impl CoordinatesVector {
         self.y = self.y * multiplier;
     }
 
+    pub fn divide_horizontal(&mut self, divisor: f32) {
+        self.x = self.x / divisor;
+        self.y = self.y / divisor;
+    }
+
     fn read_coordinate(data: &GameData, padding: usize) -> Option<f32> {
         match game_offsets::get_offset(data.handle, data.player_coordinates_offset, game_offsets::PLAYER_COORDINATES_OFFSET + padding) {
             Some(coord_offset) => return memory::read::<f32>(data.handle, coord_offset),

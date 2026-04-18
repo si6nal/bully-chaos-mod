@@ -42,7 +42,7 @@ pub enum ChaosEvents {
 
     Speed, // duplicates moving distance (30 sec)
     SpeedFaster, // duplicates moving distance at a faster rate (15 sec)
-    //Slowness, // slightly teleports the player backwards
+    Slowness, // slightly teleports the player backwards
     MaxJump, // the Speed event but vertical, gives invincibility in the air until the player is back on the ground (30 sec)
     NoJumping, // sets z value to the last z value before space was pressed (30 sec)
     Freeze, // stops the player from moving (10 sec)
@@ -95,6 +95,7 @@ impl ChaosEvents {
             ChaosEvents::SonarSisyphus  => "Sonar Sisyphus (10-18 seconds)",
             ChaosEvents::Speed          => "Speed (30 seconds)",
             ChaosEvents::SpeedFaster    => "Ugandan speed (15 seconds)",
+            ChaosEvents::Slowness       => "Slowness (20 seconds)",
             ChaosEvents::MaxJump        => "Max jump (30 seconds)",
             ChaosEvents::NoJumping      => "No jumping (30 seconds)",
             ChaosEvents::Freeze         => "Freeze (10 seconds)",
@@ -153,6 +154,7 @@ impl ChaosEvents {
             ChaosEvents::SonarSisyphus => location::sonar_sisyphus(&data).await,
             ChaosEvents::Speed => location::speed(&data).await,
             ChaosEvents::SpeedFaster => location::speed_faster(&data).await,
+            ChaosEvents::Slowness => location::slowness(&data).await,
             ChaosEvents::MaxJump => location::max_jump(&data).await,
             ChaosEvents::NoJumping => location::no_jumping(&data).await,
             ChaosEvents::Freeze => location::freeze(&data).await,

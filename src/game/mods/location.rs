@@ -149,6 +149,45 @@ pub async fn speed_faster(data: &GameData) {
     }
 }
 
+pub async fn slowness(data: &GameData) {
+    // get starting time
+    let start_time = Instant::now();
+
+    loop {
+        // check if 20 seconds has passed
+        if start_time.elapsed().as_secs() >= 20 {
+            break;
+        }
+
+        // check if the player is moving
+        if !input::is_moving() {
+            tokio::time::sleep(Duration::from_millis(5)).await;
+            continue;
+        }
+
+        // get current location
+        let current_location = CoordinatesVector::read(&data);
+
+        // sleep for difference calculation
+        tokio::time::sleep(Duration::from_millis(10)).await;
+
+        // get new location
+        let mut new_location = CoordinatesVector::read(&data);
+
+        // get displacement between locations
+        let mut displacement = current_location.get_displacement(&new_location);
+
+        // half displacement
+        displacement.divide_horizontal(2f32);
+
+        // subtract half the displacement from the current location
+        new_location.subtract(displacement);
+
+        // update location
+        CoordinatesVector::write(&data, new_location);
+    }
+}
+
 pub async fn max_jump(data: &GameData) {
     // get starting time
     let start_time = Instant::now();
