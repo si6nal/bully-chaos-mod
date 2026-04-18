@@ -40,6 +40,7 @@ pub enum ChaosEvents {
 
     Speed, // duplicates moving distance (15-20 sec)
     MaxJump, // the Speed event but vertical, gives invincibility in the air until the player is back on the ground (30 sec)
+    NoJumping, // sets z value to the last z value before space was pressed (30 sec)
     Freeze, // stops the player from moving (10 sec)
 
     HomeSweetHome, // teleport back to the dorms
@@ -89,6 +90,7 @@ impl ChaosEvents {
             ChaosEvents::SonarSisyphus  => "Sonar Sisyphus (10-18 seconds)",
             ChaosEvents::Speed          => "Supa Sprinter (10-15 seconds)",
             ChaosEvents::MaxJump        => "Max jump (30 seconds)",
+            ChaosEvents::NoJumping      => "No jumping (30 seconds)",
             ChaosEvents::Freeze         => "Freeze (10 seconds)",
             ChaosEvents::HomeSweetHome  => "Home Sweet Home",
             ChaosEvents::RandomTp       => "Random TP",
@@ -141,6 +143,7 @@ impl ChaosEvents {
             ChaosEvents::SonarSisyphus => location::sonar_sisyphus(&data).await,
             ChaosEvents::Speed => location::speed(&data).await,
             ChaosEvents::MaxJump => location::max_jump(&data).await,
+            ChaosEvents::NoJumping => location::no_jumping(&data).await,
             ChaosEvents::Freeze => location::freeze(&data).await,
             ChaosEvents::HomeSweetHome => location::teleport_dorms(&data),
             ChaosEvents::RandomTp => location::random_tp(&data),

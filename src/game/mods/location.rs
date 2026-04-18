@@ -179,6 +179,62 @@ pub async fn max_jump(data: &GameData) {
     }
 }
 
+pub async fn no_jumping(data: &GameData) {
+    // get starting time
+    let start_time = Instant::now();
+
+    // get original location
+    let original_location = CoordinatesVector::read(&data);
+
+    // variable for storing the last z value before space was pressed
+    let mut last_ground_z: f32 = original_location.z;
+    let mut has_jumped = false;
+    let mut jump_time: Instant = Instant::now();
+
+    loop {
+        // check if 30 seconds has passed
+        if start_time.elapsed().as_secs() >= 30 {
+            break;
+        }
+
+        // get current location
+        let mut current_location = CoordinatesVector::read(&data);
+
+        // check if the player isn't jumping
+        if !input::has_jumped() && !input::is_jumping() {
+            // make sure we aren't currently changing the z position
+            if !has_jumped {
+                // update last ground z
+                last_ground_z = current_location.z;
+            }
+        } else {
+            // set has jumped
+            has_jumped = true;
+            jump_time = Instant::now();
+        }
+
+        // check if the player has jumped
+        if has_jumped {
+            // check if the player is back on the ground
+            if current_location.z as i32 <= original_location.z as i32 {
+                // make sure the player has had enough time to land
+                if jump_time.elapsed().as_secs() >= 4 {
+                    has_jumped = false;
+                }
+            }
+
+            // update z location
+            current_location.z = last_ground_z;
+
+            // update location
+            CoordinatesVector::write(&data, current_location);
+        }
+
+        // sleep
+        tokio::time::sleep(Duration::from_millis(1)).await;
+    }
+}
+
 pub async fn freeze(data: &GameData) {
     // get starting time
     let start_time = Instant::now();
