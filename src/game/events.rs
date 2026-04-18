@@ -38,6 +38,7 @@ pub enum ChaosEvents {
     SonarSisyphus, // teleports the player back to their original pos with an increasing delay (10-18 sec)
 
     Speed, // duplicates moving distance (15-20 sec)
+    //MaxJump, // the Speed event but vertical, gives invincibility in the air until the player is back on the ground (30 sec)
     Freeze, // stops the player from moving (10 sec)
 
     HomeSweetHome, // teleport back to the dorms
@@ -47,6 +48,8 @@ pub enum ChaosEvents {
     FakeSkyTp, // teleports the player into the sky & back onto the ground before dying
     HellTp, // teleports the player into the ground
     //Bus, // teleports to bus stop & gets on bus
+    ReverseGravity, // determines the current gravity & applies it oppositely (10 sec)
+    Phoon, // makes the player jump (30 sec)
 
     /* ============ */
     /* WINDOWS MODS */
@@ -59,7 +62,6 @@ pub enum ChaosEvents {
     //OppositeInput, // causes the player to move opposite of their key presses (send release & press+release messages) (30 sec)
     //CameraSpin, // sends mouse movement messages to rotate the camera (20 sec)
     //ConstantAttacking, // sends key presses to attack (15 sec)
-    //Phoon, // sends key presses to jump (15 sec)
     //TakeYourMeds, // mutes the game (15 sec)
     //RandomPicture, // choose a random picture to render in-game from a pictures folder alongside the exe, maybe make the image bounce around the screen
 }
@@ -90,9 +92,10 @@ impl ChaosEvents {
             ChaosEvents::SkyTp          => "Sky TP (Suicide)",
             ChaosEvents::FakeSkyTp      => "Fake Sky TP",
             ChaosEvents::HellTp         => "Mole POV (Suicide)",
+            ChaosEvents::ReverseGravity => "Reverse gravity (10 seconds)",
             ChaosEvents::FakeCrash      => "Fake crash",
             ChaosEvents::RealCrash      => "Real crash",
-            //ChaosEvents::Phoon          => "Phoon",
+            ChaosEvents::Phoon          => "Phoon (30 seconds)",
         }
     }
 
@@ -138,9 +141,10 @@ impl ChaosEvents {
             ChaosEvents::SkyTp => location::sky_tp(&data),
             ChaosEvents::FakeSkyTp => location::fake_sky_tp(&data).await,
             ChaosEvents::HellTp => location::hell_tp(&data),
+            ChaosEvents::ReverseGravity => location::reverse_gravity(&data).await,
             ChaosEvents::FakeCrash => processes::pause_process(data.process_id, 4).await,
             ChaosEvents::RealCrash => processes::terminate_process(data.handle), // todo: pause process like fake crash before terminating
-            //ChaosEvents::Phoon => input::phoon(&data).await,
+            ChaosEvents::Phoon => location::phoon(&data).await,
         }
     }
 

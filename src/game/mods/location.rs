@@ -1,9 +1,12 @@
 use std::time::{Duration, Instant};
+use log::debug;
 use crate::game::bully::GameData;
 use crate::game::mods::health;
 use crate::memory::coordinates_vector::CoordinatesVector;
 
 pub async fn sisyphus(data: &GameData) {
+    // todo: implement is_moving check
+    
     // get starting location
     let starting_location = CoordinatesVector::read(&data);
 
@@ -32,6 +35,8 @@ pub async fn sisyphus(data: &GameData) {
 }
 
 pub async fn sonar_sisyphus(data: &GameData) {
+    // todo: implement is_moving check
+    
     // get starting location
     let starting_location = CoordinatesVector::read(&data);
 
@@ -62,6 +67,8 @@ pub async fn sonar_sisyphus(data: &GameData) {
 }
 
 pub async fn speed(data: &GameData) {
+    // todo: implement is_moving check
+    
     // get starting time & a random duration
     let start_time = Instant::now();
     let duration = rand::random_range(15..20);
@@ -93,6 +100,8 @@ pub async fn speed(data: &GameData) {
 }
 
 pub async fn freeze(data: &GameData) {
+    // todo: implement is_moving check
+    
     // get starting time
     let start_time = Instant::now();
 
@@ -222,6 +231,87 @@ pub fn hell_tp(data: &GameData) {
 
     // update location
     CoordinatesVector::write(&data, current_location);
+}
+
+pub async fn reverse_gravity(data: &GameData) {
+    /*// determine gravity
+    let mut starting_position = CoordinatesVector::read(&data);
+
+    // add some height
+    starting_position.z += 1f32;
+
+    // update position
+    CoordinatesVector::write(&data, starting_position.clone());
+
+    // sleep for 1ms & get updated position
+    tokio::time::sleep(Duration::from_millis(1)).await;
+
+    // get new position
+    let gravity_position = CoordinatesVector::read(&data);
+
+    // determine gravity
+    let gravity = gravity_position.z - starting_position.z;
+    //debug!("gravity_position.z: {} | starting_position.z: {} | gravity: {}", gravity_position.z, starting_position.z, gravity);*/
+
+    // get starting time & a random duration
+    let start_time = Instant::now();
+
+    // variables for increasing gravity
+    let mut gravity_multiplier: f32 = 1.025569439;
+    let mut frame_counter: usize = 0;
+
+    loop {
+        // check if the 10 seconds has passed
+        if start_time.elapsed().as_secs() >= 5 {
+            break;
+        }
+
+        // get current position
+        let mut current_location = CoordinatesVector::read(&data);
+
+        // apply gravity, stop at 150z
+        current_location.z = (current_location.z * gravity_multiplier).min(150f32);
+
+        // check if we should increment gravity
+        if frame_counter % 23 == 0 {
+            // add gravity to multiplier & make sure we don't go up too fast
+            // -0.025569439
+            gravity_multiplier = (gravity_multiplier + 0.025569439).min(1.041f32); // 1.0389f32
+        }
+
+        // update position
+        CoordinatesVector::write(&data, current_location);
+
+        // sleep for 1ms
+        tokio::time::sleep(Duration::from_millis(1)).await;
+
+        // add frame
+        frame_counter += 1;
+    }
+}
+
+pub async fn phoon(data: &GameData) {
+    // get starting time & a random duration
+    let start_time = Instant::now();
+
+    loop {
+        // check if the 30 seconds has passed
+        if start_time.elapsed().as_secs() >= 30 {
+            break;
+        }
+
+        // get current position
+        let mut current_location = CoordinatesVector::read(&data);
+
+        // multiply z for bouncing affect
+        current_location.z *= 1.025;
+
+        // update position
+        CoordinatesVector::write(&data, current_location);
+
+        // sleep for 1ms
+        tokio::time::sleep(Duration::from_millis(1)).await;
+    }
 }
 
 /*pub fn get_location(data: &GameData) {
