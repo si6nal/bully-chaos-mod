@@ -153,7 +153,13 @@ impl ChaosEvents {
             ChaosEvents::HellTp => location::hell_tp(&data),
             ChaosEvents::ReverseGravity => location::reverse_gravity(&data).await,
             ChaosEvents::FakeCrash => processes::pause_process(data.process_id, 4).await,
-            ChaosEvents::RealCrash => processes::terminate_process(data.handle), // todo: pause process like fake crash before terminating
+            ChaosEvents::RealCrash => {
+                // pause process (fake crash)
+                processes::pause_process(data.process_id, 4).await;
+
+                // "crash" (close) process
+                processes::terminate_process(data.handle)
+            },
             ChaosEvents::Phoon => location::phoon(&data).await,
             ChaosEvents::MinimizeGame => window::minimize_window(data.window_handle),
         }

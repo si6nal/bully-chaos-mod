@@ -102,8 +102,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 //tokio::time::sleep(Duration::from_secs(5)).await;
                 //game::mods::health::suicide(&game_data);
                 //game::mods::ammo::give_all_ammo(&game_data);
-                //game::mods::location::max_jump(&game_data).await;
-                //game::mods::trouble_meter::max_trouble(&game_data).await;
+                //game::mods::location::no_jumping(&game_data).await;
+                //game::mods::trouble_meter::trouble_health(&game_data).await;
             }
 
             // check if we should apply the reduced voting timer
