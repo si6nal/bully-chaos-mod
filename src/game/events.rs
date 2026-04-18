@@ -21,7 +21,8 @@ pub enum ChaosEvents {
     /* MEMORY MODS */
     /* =========== */
     RemoveMoney, // money = 0
-    //SpareChange, // money = 25
+    CheckBounced, // money = 25
+    SpareChange, // adds a random amount of money ($.01-$10.00)
     MaxMoney, // money = i32 max ~ capped at 1m
 
     Invincibility, // 30sec setting health to 100
@@ -79,6 +80,8 @@ impl ChaosEvents {
             ChaosEvents::Nothing1Min    => "Nothing for 1 minute",
             ChaosEvents::RandomEvent    => "Random event",
             ChaosEvents::RemoveMoney    => "Remove all money",
+            ChaosEvents::CheckBounced   => "Check bounced",
+            ChaosEvents::SpareChange    => "Spare change",
             ChaosEvents::MaxMoney       => "Max money",
             ChaosEvents::Invincibility  => "Invincibility (30 seconds)",
             ChaosEvents::Heal           => "Heal",
@@ -132,6 +135,8 @@ impl ChaosEvents {
                 }
             },
             ChaosEvents::RemoveMoney => money::remove_money(&data),
+            ChaosEvents::CheckBounced => money::check_bounced(&data),
+            ChaosEvents::SpareChange => money::spare_change(&data),
             ChaosEvents::MaxMoney => money::give_max_money(&data),
             ChaosEvents::Invincibility => health::give_invincibility(&data).await,
             ChaosEvents::Heal => health::heal(&data),
