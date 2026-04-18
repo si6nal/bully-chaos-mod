@@ -84,7 +84,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\debugging\debug_toggles.cpp" />
+    <ClCompile Include="src\debugging\modules\module_walker.cpp" />
     <ClCompile Include="src\entry.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\debugging\debug_toggles.hpp" />
+    <ClInclude Include="src\debugging\modules\module_walker.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

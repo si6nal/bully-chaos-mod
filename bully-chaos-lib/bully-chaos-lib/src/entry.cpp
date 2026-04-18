@@ -1,6 +1,10 @@
 #include <Windows.h>
 #include <iostream>
 
+#ifdef _DEBUG
+#include "debugging/debug_toggles.hpp"
+#endif
+
 void create_console( ) {
 	// allocate console window, this will create a new console window
 	AllocConsole( );
@@ -27,6 +31,11 @@ int __stdcall DllMain( void *instance, unsigned long reason, void *reserved ) {
 	if ( reason == DLL_PROCESS_ATTACH ) {
 		// create console window
 		create_console( );
+
+		// handle debug toggles
+		#ifdef _DEBUG
+		handle_toggles( );
+		#endif
 
 		// debugging
 		MessageBoxA( nullptr, "Test", "Test", MB_OK );
