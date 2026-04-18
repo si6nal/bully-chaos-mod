@@ -75,13 +75,12 @@ pub async fn sonar_sisyphus(data: &GameData) {
 }
 
 pub async fn speed(data: &GameData) {
-    // get starting time & a random duration
+    // get starting time
     let start_time = Instant::now();
-    let duration = rand::random_range(15..20);
 
     loop {
-        // check if the random duration has passed
-        if start_time.elapsed().as_secs() >= duration {
+        // check if 30 seconds has passed
+        if start_time.elapsed().as_secs() >= 30 {
             break;
         }
 
@@ -95,13 +94,52 @@ pub async fn speed(data: &GameData) {
         let current_location = CoordinatesVector::read(&data);
 
         // sleep for difference calculation
-        tokio::time::sleep(Duration::from_millis(50)).await;
+        tokio::time::sleep(Duration::from_millis(20)).await;
 
         // get new location
         let mut new_location = CoordinatesVector::read(&data);
 
         // get displacement between locations
         let displacement = current_location.get_displacement(&new_location);
+
+        // add difference to new location
+        new_location.add(displacement);
+
+        // update location
+        CoordinatesVector::write(&data, new_location);
+    }
+}
+
+pub async fn speed_faster(data: &GameData) {
+    // get starting time
+    let start_time = Instant::now();
+
+    loop {
+        // check if 15 seconds has passed
+        if start_time.elapsed().as_secs() >= 15 {
+            break;
+        }
+
+        // check if the player is moving
+        if !input::is_moving() {
+            tokio::time::sleep(Duration::from_millis(5)).await;
+            continue;
+        }
+
+        // get current location
+        let current_location = CoordinatesVector::read(&data);
+
+        // sleep for difference calculation
+        tokio::time::sleep(Duration::from_millis(10)).await;
+
+        // get new location
+        let mut new_location = CoordinatesVector::read(&data);
+
+        // get displacement between locations
+        let mut displacement = current_location.get_displacement(&new_location);
+
+        // add extra displacement
+        displacement.multiply_horizontal(2f32);
 
         // add difference to new location
         new_location.add(displacement);

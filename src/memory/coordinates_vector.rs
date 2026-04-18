@@ -74,6 +74,11 @@ impl CoordinatesVector {
         self.y = self.y + other_coordinates.y;
         self.z = self.z + other_coordinates.z;
     }
+    
+    pub fn multiply_horizontal(&mut self, multiplier: f32) {
+        self.x = self.x * multiplier;
+        self.y = self.y * multiplier;
+    }
 
     fn read_coordinate(data: &GameData, padding: usize) -> Option<f32> {
         match game_offsets::get_offset(data.handle, data.player_coordinates_offset, game_offsets::PLAYER_COORDINATES_OFFSET + padding) {
