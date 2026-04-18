@@ -279,15 +279,26 @@ pub async fn fake_random_tp(data: &GameData) {
     // get current location
     let original_location = CoordinatesVector::read(&data);
 
+    // get current health (we will reset to it)
+    let original_health = health::get_health(&data);
+
+    // give an unreasonable amount of health to prevent dying
+    health::update_health(&data, 999999f32);
+
     // teleport to random location
     random_tp(&data);
 
     // sleep for 5 seconds
-    // todo: give invincibility for the 5 seconds
     tokio::time::sleep(Duration::from_secs(5)).await;
 
     // teleport back to original location
     CoordinatesVector::write(&data, original_location);
+
+    // reset health
+    match original_health {
+        Some(original_health) => health::update_health(&data, original_health),
+        None => health::heal(&data)
+    }
 }
 
 pub fn sky_tp(data: &GameData) {
