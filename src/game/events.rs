@@ -17,9 +17,9 @@ pub enum ChaosEvents {
     Nothing1Min, // does nothing for 1 minute
     RandomEvent, // selects another event
 
-    /* =========== */
-    /* MEMORY MODS */
-    /* =========== */
+    /* ============= */
+    /* MEMORY EVENTS */
+    /* ============= */
     RemoveMoney, // money = 0
     CheckBounced, // money = 25
     SpareChange, // adds a random amount of money ($.01-$10.00)
@@ -59,17 +59,24 @@ pub enum ChaosEvents {
     OppositeInput, // applies movement in the opposite direction
 
     /* ============ */
-    /* WINDOWS MODS */
+    /* INPUT EVENTS */
     /* ============ */
-    FakeCrash, // suspends the game for 3 seconds
-    RealCrash, // closes the game
-    MinimizeGame, // minimizes the game window
-
     //Schizophrenia, // randomly presses movement keys & moves the mouse, 2-6sec input delay (30 sec)
     //CameraSpin, // sends mouse movement messages to rotate the camera (20 sec)
     //ConstantAttacking, // sends key presses to attack (15 sec)
-    //TakeYourMeds, // mutes the game (15 sec)
+
+    /* ================ */
+    /* RENDERING EVENTS */
+    /* ================ */
     //RandomPicture, // choose a random picture to render in-game from a pictures folder alongside the exe, maybe make the image bounce around the screen
+
+    /* ============== */
+    /* WINDOWS EVENTS */
+    /* ============== */
+    FakeCrash, // suspends the game for 4 seconds
+    RealCrash, // closes the game
+    MinimizeGame, // minimizes the game window
+    //TakeYourMeds, // mutes the game (15 sec)
 }
 
 impl ChaosEvents {
