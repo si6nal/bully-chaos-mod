@@ -416,6 +416,41 @@ pub fn hell_tp(data: &GameData) {
     CoordinatesVector::write(&data, current_location);
 }
 
+pub fn bus_tp(data: &GameData) {
+    // this doesn't include bus stop locations from the north-east island or the west most bus stop
+    let bus_stop_locations: Vec<CoordinatesVector> = vec![
+        CoordinatesVector::from(304.43604f32, 269.8308f32, 5.436815f32), // { x: 304.43604, y: 269.8308, z: 5.436815 }
+        CoordinatesVector::from(459.7717f32, 244.46739f32, 10.634422f32), // { x: 459.7717, y: 244.46739, z: 10.634422 }
+        CoordinatesVector::from(537.21747f32, 417.62842f32, 17.077328f32), // { x: 537.21747, y: 417.62842, z: 17.077328 }
+        CoordinatesVector::from(586.89514f32, -47.421276f32, 5.915363f32), // { x: 586.89514, y: -47.421276, z: 5.915363 }
+        CoordinatesVector::from(125.42762f32, -377.4589f32, 2.2570353f32), // { x: 125.42762, y: -377.4589, z: 2.2570353 }
+        CoordinatesVector::from(256.95206f32, -418.27426f32, 2.6757145f32), // { x: 256.95206, y: -418.27426, z: 2.6757145 }
+    ];
+
+    // get current location
+    let current_location = CoordinatesVector::read(&data);
+
+    // determine the closest bus stop
+    let mut closest_bus_stop_location = current_location.clone();
+    let mut best_distance = f32::MAX;
+    for bus_stop_location in bus_stop_locations {
+        // get distance to bus stop
+        let distance = current_location.distance_to(&bus_stop_location);
+
+        // check if it's the closest
+        if distance < best_distance {
+            closest_bus_stop_location = bus_stop_location;
+            best_distance = distance;
+        }
+    }
+
+    // move bus stop location slightly up to prevent potential clipping
+    closest_bus_stop_location.z += 0.5f32;
+
+    // teleport to the closest bus stop
+    CoordinatesVector::write(&data, closest_bus_stop_location);
+}
+
 pub async fn reverse_gravity(data: &GameData) {
     /*// determine gravity
     let mut starting_position = CoordinatesVector::read(&data);
@@ -536,7 +571,39 @@ pub async fn opposite_input(data: &GameData) {
     }
 }
 
-/*pub fn get_location(data: &GameData) {
-    let coordinates = CoordinatesVector::read(data);
-    debug!("{:?}", coordinates);
+/*pub async fn get_location(data: &GameData) {
+    loop {
+        let coordinates = CoordinatesVector::read(data);
+        log::debug!("{:?}", coordinates);
+        tokio::time::sleep(Duration::from_millis(500)).await;
+
+        {
+            // check if the player is moving
+            if !input::is_moving() {
+                tokio::time::sleep(Duration::from_millis(5)).await;
+                continue;
+            }
+
+            // get current location
+            let current_location = CoordinatesVector::read(&data);
+
+            // sleep for difference calculation
+            tokio::time::sleep(Duration::from_millis(10)).await;
+
+            // get new location
+            let mut new_location = CoordinatesVector::read(&data);
+
+            // get displacement between locations
+            let mut displacement = current_location.get_displacement(&new_location);
+
+            // add extra displacement
+            displacement.multiply_horizontal(3f32);
+
+            // add difference to new location
+            new_location.add(displacement);
+
+            // update location
+            CoordinatesVector::write(&data, new_location);
+        }
+    }
 }*/

@@ -42,6 +42,7 @@ pub enum ChaosEvents {
 
     Speed, // duplicates moving distance (30 sec)
     SpeedFaster, // duplicates moving distance at a faster rate (15 sec)
+    //Slowness, // slightly teleports the player backwards
     MaxJump, // the Speed event but vertical, gives invincibility in the air until the player is back on the ground (30 sec)
     NoJumping, // sets z value to the last z value before space was pressed (30 sec)
     Freeze, // stops the player from moving (10 sec)
@@ -52,7 +53,7 @@ pub enum ChaosEvents {
     SkyTp, // teleports the player into the sky
     FakeSkyTp, // teleports the player into the sky & back onto the ground before dying
     HellTp, // teleports the player into the ground
-    //Bus, // teleports to bus stop & gets on bus
+    BusTp, // teleports to the closest bus stop
     ReverseGravity, // determines the current gravity & applies it oppositely (10 sec)
     Phoon, // makes the player jump (30 sec)
     OppositeInput, // applies movement in the opposite direction
@@ -103,6 +104,7 @@ impl ChaosEvents {
             ChaosEvents::SkyTp          => "Sky TP (Suicide)",
             ChaosEvents::FakeSkyTp      => "Fake Sky TP",
             ChaosEvents::HellTp         => "Mole POV (Suicide)",
+            ChaosEvents::BusTp          => "BUS",
             ChaosEvents::ReverseGravity => "Reverse gravity (10 seconds)",
             ChaosEvents::Phoon          => "Phoon (30 seconds)",
             ChaosEvents::OppositeInput  => "Opposite input (30 seconds)",
@@ -160,6 +162,7 @@ impl ChaosEvents {
             ChaosEvents::SkyTp => location::sky_tp(&data),
             ChaosEvents::FakeSkyTp => location::fake_sky_tp(&data).await,
             ChaosEvents::HellTp => location::hell_tp(&data),
+            ChaosEvents::BusTp => location::bus_tp(&data),
             ChaosEvents::ReverseGravity => location::reverse_gravity(&data).await,
             ChaosEvents::Phoon => location::phoon(&data).await,
             ChaosEvents::OppositeInput => location::opposite_input(&data).await,

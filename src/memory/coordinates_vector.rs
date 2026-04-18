@@ -4,9 +4,9 @@ use crate::memory::{game_offsets, memory};
 
 #[derive(Debug, Clone)]
 pub struct CoordinatesVector {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
+    pub x: f32, // north/south
+    pub y: f32, // west/east
+    pub z: f32, // vertical
 }
 
 impl CoordinatesVector {
@@ -45,6 +45,10 @@ impl CoordinatesVector {
         CoordinatesVector { x: 0.0, y: 0.0, z: 0.0 }
     }
 
+    pub fn from(x: f32, y: f32, z: f32) -> CoordinatesVector {
+        CoordinatesVector { x, y, z }
+    }
+
     pub fn has_moved(&self, other_coordinates: &CoordinatesVector, distance: f32) -> bool {
         // get difference between coordinates
         let difference = self.get_abs_delta(&other_coordinates);
@@ -69,18 +73,25 @@ impl CoordinatesVector {
         }
     }
 
+    pub fn distance_to(&self, other_coordinates: &CoordinatesVector) -> f32 {
+        let x_dist = other_coordinates.x - self.x;
+        let y_dist = other_coordinates.y - self.y;
+        let z_dist = other_coordinates.z - self.z;
+        ((x_dist * x_dist) + (y_dist * y_dist) + (z_dist * z_dist)).sqrt()
+    }
+
     pub fn add(&mut self, other_coordinates: CoordinatesVector) {
         self.x = self.x + other_coordinates.x;
         self.y = self.y + other_coordinates.y;
         self.z = self.z + other_coordinates.z;
     }
-    
+
     pub fn subtract(&mut self, other_coordinates: CoordinatesVector) {
         self.x = self.x - other_coordinates.x;
         self.y = self.y - other_coordinates.y;
         self.z = self.z - other_coordinates.z;
     }
-    
+
     pub fn multiply_horizontal(&mut self, multiplier: f32) {
         self.x = self.x * multiplier;
         self.y = self.y * multiplier;
