@@ -29,6 +29,7 @@ pub enum ChaosEvents {
     Suicide, // health = 0
 
     MostWanted, // max trouble meter (30 sec)
+    WantedHealth, // sets trouble meter to health (30 sec)
     RemoveWanted, // wanted level = 0
 
     RemoveAllAmmo, // removes all ammo
@@ -80,6 +81,7 @@ impl ChaosEvents {
             ChaosEvents::NoHealth       => "I need a doctor (1hp)",
             ChaosEvents::Suicide        => "You serve zero purpose",
             ChaosEvents::MostWanted     => "Most wanted (30 seconds)",
+            ChaosEvents::WantedHealth   => "Health is trouble (30 seconds)",
             ChaosEvents::RemoveWanted   => "Remove trouble",
             ChaosEvents::RemoveAllAmmo  => "Remove all ammo",
             ChaosEvents::GiveAllAmmo    => "Give all ammo",
@@ -131,6 +133,7 @@ impl ChaosEvents {
             ChaosEvents::NoHealth => health::no_health(&data),
             ChaosEvents::Suicide => health::suicide(&data),
             ChaosEvents::MostWanted => trouble_meter::max_trouble(&data).await,
+            ChaosEvents::WantedHealth => trouble_meter::trouble_health(&data).await,
             ChaosEvents::RemoveWanted => trouble_meter::remove_trouble(&data),
             ChaosEvents::RemoveAllAmmo => ammo::remove_all_ammo(&data),
             ChaosEvents::GiveAllAmmo => ammo::give_all_ammo(&data),
