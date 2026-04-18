@@ -84,7 +84,7 @@ pub async fn speed(data: &GameData) {
         if start_time.elapsed().as_secs() >= duration {
             break;
         }
-        
+
         // check if the player is moving
         if !input::is_moving() {
             tokio::time::sleep(Duration::from_millis(5)).await;
@@ -111,6 +111,74 @@ pub async fn speed(data: &GameData) {
     }
 }
 
+pub async fn max_jump(data: &GameData) {
+    // get starting time
+    let start_time = Instant::now();
+
+    loop {
+        // check if 30 seconds has passed
+        if start_time.elapsed().as_secs() >= 30 {
+            break;
+        }
+
+        // check if the player has pressed space
+        if !input::has_jumped() && !input::is_jumping() {
+            tokio::time::sleep(Duration::from_millis(5)).await;
+            continue;
+        }
+
+        // get current health (we will reset to it)
+        let original_health = health::get_health(&data);
+
+        // get original location
+        let original_location = CoordinatesVector::read(&data);
+
+        // give an unreasonable amount of health to prevent dying
+        health::update_health(&data, 999999f32);
+
+        // apply vertical motion
+        for _ in 0..5 {
+            // get current location
+            let mut current_location = CoordinatesVector::read(&data);
+
+            // add to z coordinate
+            current_location.z += 3f32;
+
+            // update coordinates
+            CoordinatesVector::write(&data, current_location);
+
+            // sleep
+            tokio::time::sleep(Duration::from_millis(30)).await;
+        }
+
+        // wait for player to get back on-ground
+        loop {
+            // get current location
+            let current_location = CoordinatesVector::read(&data);
+
+            // check if we're back on the ground
+            if current_location.z as i32 <= original_location.z as i32 {
+                // wait for us to be fully on-ground (prevent accidental death)
+                tokio::time::sleep(Duration::from_millis(500)).await;
+
+                // reset health
+                match original_health {
+                    Some(original_health) => {
+                        health::update_health(&data, original_health);
+                        break;
+                    },
+                    None => health::heal(&data)
+                }
+
+                break;
+            }
+
+            // sleep
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+    }
+}
+
 pub async fn freeze(data: &GameData) {
     // get starting time
     let start_time = Instant::now();
@@ -120,7 +188,7 @@ pub async fn freeze(data: &GameData) {
         if start_time.elapsed().as_secs() >= 10 {
             break;
         }
-        
+
         // get current location
         let current_location = CoordinatesVector::read(&data);
 

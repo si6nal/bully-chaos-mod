@@ -8,6 +8,10 @@ pub fn has_jumped() -> bool {
     is_key_pressed(VK_SPACE)
 }
 
+pub fn is_jumping() -> bool {
+    is_key_down(VK_SPACE)
+}
+
 fn is_key_down(key: VIRTUAL_KEY) -> bool {
     unsafe {
         (GetAsyncKeyState(key.0 as i32) as u16 & 0x8000) != 0
