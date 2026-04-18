@@ -21,6 +21,7 @@ pub enum ChaosEvents {
     /* MEMORY MODS */
     /* =========== */
     RemoveMoney, // money = 0
+    //SpareChange, // money = 25
     MaxMoney, // money = i32 max ~ capped at 1m
 
     Invincibility, // 30sec setting health to 100
@@ -38,7 +39,8 @@ pub enum ChaosEvents {
     Sisyphus, // teleports the player back to their original pos if they move more than 3 units (10-18 sec)
     SonarSisyphus, // teleports the player back to their original pos with an increasing delay (10-18 sec)
 
-    Speed, // duplicates moving distance (15-20 sec)
+    Speed, // duplicates moving distance (30 sec) // todo: update duration
+    //SpeedFaster, // duplicates moving distance at a faster rate (15-20 sec)
     MaxJump, // the Speed event but vertical, gives invincibility in the air until the player is back on the ground (30 sec)
     NoJumping, // sets z value to the last z value before space was pressed (30 sec)
     Freeze, // stops the player from moving (10 sec)
@@ -52,6 +54,7 @@ pub enum ChaosEvents {
     //Bus, // teleports to bus stop & gets on bus
     ReverseGravity, // determines the current gravity & applies it oppositely (10 sec)
     Phoon, // makes the player jump (30 sec)
+    //OppositeInput, // applies movement in the opposite direction // todo: remove other OppositeInput
 
     /* ============ */
     /* WINDOWS MODS */
