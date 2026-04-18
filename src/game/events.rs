@@ -40,7 +40,7 @@ pub enum ChaosEvents {
     Sisyphus, // teleports the player back to their original pos if they move more than 3 units (10-18 sec)
     SonarSisyphus, // teleports the player back to their original pos with an increasing delay (10-18 sec)
 
-    Speed, // duplicates moving distance (30 sec) // todo: update duration
+    Speed, // duplicates moving distance (30 sec)
     SpeedFaster, // duplicates moving distance at a faster rate (15 sec)
     MaxJump, // the Speed event but vertical, gives invincibility in the air until the player is back on the ground (30 sec)
     NoJumping, // sets z value to the last z value before space was pressed (30 sec)
@@ -55,7 +55,7 @@ pub enum ChaosEvents {
     //Bus, // teleports to bus stop & gets on bus
     ReverseGravity, // determines the current gravity & applies it oppositely (10 sec)
     Phoon, // makes the player jump (30 sec)
-    //OppositeInput, // applies movement in the opposite direction // todo: remove other OppositeInput
+    OppositeInput, // applies movement in the opposite direction
 
     /* ============ */
     /* WINDOWS MODS */
@@ -65,8 +65,6 @@ pub enum ChaosEvents {
     MinimizeGame, // minimizes the game window
 
     //Schizophrenia, // randomly presses movement keys & moves the mouse, 2-6sec input delay (30 sec)
-    // todo: try to implement opposite input as a memory mod, get difference between location every 5/10ms & apply distance in opposite direction
-    //OppositeInput, // causes the player to move opposite of their key presses (send release & press+release messages) (30 sec)
     //CameraSpin, // sends mouse movement messages to rotate the camera (20 sec)
     //ConstantAttacking, // sends key presses to attack (15 sec)
     //TakeYourMeds, // mutes the game (15 sec)
@@ -107,6 +105,7 @@ impl ChaosEvents {
             ChaosEvents::HellTp         => "Mole POV (Suicide)",
             ChaosEvents::ReverseGravity => "Reverse gravity (10 seconds)",
             ChaosEvents::Phoon          => "Phoon (30 seconds)",
+            ChaosEvents::OppositeInput  => "Opposite input (30 seconds)",
             ChaosEvents::FakeCrash      => "Fake crash",
             ChaosEvents::RealCrash      => "Real crash",
             ChaosEvents::MinimizeGame   => "Minimize game",
@@ -162,6 +161,8 @@ impl ChaosEvents {
             ChaosEvents::FakeSkyTp => location::fake_sky_tp(&data).await,
             ChaosEvents::HellTp => location::hell_tp(&data),
             ChaosEvents::ReverseGravity => location::reverse_gravity(&data).await,
+            ChaosEvents::Phoon => location::phoon(&data).await,
+            ChaosEvents::OppositeInput => location::opposite_input(&data).await,
             ChaosEvents::FakeCrash => processes::pause_process(data.process_id, 4).await,
             ChaosEvents::RealCrash => {
                 // pause process (fake crash)
@@ -170,7 +171,6 @@ impl ChaosEvents {
                 // "crash" (close) process
                 processes::terminate_process(data.handle)
             },
-            ChaosEvents::Phoon => location::phoon(&data).await,
             ChaosEvents::MinimizeGame => window::minimize_window(data.window_handle),
         }
     }

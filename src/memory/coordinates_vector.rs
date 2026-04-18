@@ -75,6 +75,12 @@ impl CoordinatesVector {
         self.z = self.z + other_coordinates.z;
     }
     
+    pub fn subtract(&mut self, other_coordinates: CoordinatesVector) {
+        self.x = self.x - other_coordinates.x;
+        self.y = self.y - other_coordinates.y;
+        self.z = self.z - other_coordinates.z;
+    }
+    
     pub fn multiply_horizontal(&mut self, multiplier: f32) {
         self.x = self.x * multiplier;
         self.y = self.y * multiplier;
