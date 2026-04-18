@@ -65,11 +65,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let game_data = GameData::get().await;
 
         // load bully-chaos-lib
-        if !injection::load_library(game_data.handle, game_data.process_id, injection::get_full_dll_path("bully-chaos-lib.dll")) {
+        /*if !injection::load_library(game_data.handle, game_data.process_id, injection::get_full_dll_path("bully-chaos-lib.dll")) {
             warn!("failed to load bully-chaos-lib.");
             tokio::time::sleep(Duration::from_secs(10)).await;
             continue;
-        }
+        }*/
 
         // counter for how many events have been executed
         let mut event_counter: u32 = 0;
@@ -99,10 +99,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let mut votes: HashMap<String, u8> = HashMap::new();
 
             /* testing */ {
-                //health::heal(&game_data);
-                //ammo::give_all_ammo(&game_data);
-                //location::fake_sky_tp(&game_data).await;
-                //trouble_meter::max_trouble(&game_data).await;
+                //tokio::time::sleep(Duration::from_secs(5)).await;
+                //game::mods::health::suicide(&game_data);
+                //game::mods::ammo::give_all_ammo(&game_data);
+                //game::mods::location::speed(&game_data).await;
+                //game::mods::trouble_meter::max_trouble(&game_data).await;
             }
 
             // check if we should apply the reduced voting timer

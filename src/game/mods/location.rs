@@ -1,12 +1,10 @@
 use std::time::{Duration, Instant};
-use log::debug;
 use crate::game::bully::GameData;
 use crate::game::mods::health;
 use crate::memory::coordinates_vector::CoordinatesVector;
+use crate::windows::input;
 
 pub async fn sisyphus(data: &GameData) {
-    // todo: implement is_moving check
-    
     // get starting location
     let starting_location = CoordinatesVector::read(&data);
 
@@ -18,6 +16,12 @@ pub async fn sisyphus(data: &GameData) {
         // check if the random duration has passed
         if start_time.elapsed().as_secs() >= duration {
             break;
+        }
+
+        // check if the player is moving
+        if !input::is_moving() {
+            tokio::time::sleep(Duration::from_millis(5)).await;
+            continue;
         }
 
         // get current location
@@ -35,8 +39,6 @@ pub async fn sisyphus(data: &GameData) {
 }
 
 pub async fn sonar_sisyphus(data: &GameData) {
-    // todo: implement is_moving check
-    
     // get starting location
     let starting_location = CoordinatesVector::read(&data);
 
@@ -53,6 +55,12 @@ pub async fn sonar_sisyphus(data: &GameData) {
             break;
         }
 
+        // check if the player is moving
+        if !input::is_moving() {
+            tokio::time::sleep(Duration::from_millis(5)).await;
+            continue;
+        }
+
         // sleep for sonar effect
         tokio::time::sleep(Duration::from_millis(sleep_ms)).await;
 
@@ -67,8 +75,6 @@ pub async fn sonar_sisyphus(data: &GameData) {
 }
 
 pub async fn speed(data: &GameData) {
-    // todo: implement is_moving check
-    
     // get starting time & a random duration
     let start_time = Instant::now();
     let duration = rand::random_range(15..20);
@@ -77,6 +83,12 @@ pub async fn speed(data: &GameData) {
         // check if the random duration has passed
         if start_time.elapsed().as_secs() >= duration {
             break;
+        }
+        
+        // check if the player is moving
+        if !input::is_moving() {
+            tokio::time::sleep(Duration::from_millis(5)).await;
+            continue;
         }
 
         // get current location
@@ -100,8 +112,6 @@ pub async fn speed(data: &GameData) {
 }
 
 pub async fn freeze(data: &GameData) {
-    // todo: implement is_moving check
-    
     // get starting time
     let start_time = Instant::now();
 
@@ -110,7 +120,7 @@ pub async fn freeze(data: &GameData) {
         if start_time.elapsed().as_secs() >= 10 {
             break;
         }
-
+        
         // get current location
         let current_location = CoordinatesVector::read(&data);
 
