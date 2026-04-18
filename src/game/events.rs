@@ -7,7 +7,7 @@ use twitch_irc::{SecureTCPTransport, TwitchIRCClient};
 use twitch_irc::login::StaticLoginCredentials;
 use crate::game::bully::GameData;
 use crate::game::mods::{ammo, health, location, money, trouble_meter};
-use crate::windows::processes;
+use crate::windows::{processes, window};
 
 // events that are commented out aren't implemented
 // todo: add weight to events
@@ -56,6 +56,7 @@ pub enum ChaosEvents {
     /* ============ */
     FakeCrash, // suspends the game for 3 seconds
     RealCrash, // closes the game
+    MinimizeGame, // minimizes the game window
 
     //Schizophrenia, // randomly presses movement keys & moves the mouse, 2-6sec input delay (30 sec)
     // todo: try to implement opposite input as a memory mod, get difference between location every 5/10ms & apply distance in opposite direction
@@ -93,9 +94,10 @@ impl ChaosEvents {
             ChaosEvents::FakeSkyTp      => "Fake Sky TP",
             ChaosEvents::HellTp         => "Mole POV (Suicide)",
             ChaosEvents::ReverseGravity => "Reverse gravity (10 seconds)",
+            ChaosEvents::Phoon          => "Phoon (30 seconds)",
             ChaosEvents::FakeCrash      => "Fake crash",
             ChaosEvents::RealCrash      => "Real crash",
-            ChaosEvents::Phoon          => "Phoon (30 seconds)",
+            ChaosEvents::MinimizeGame   => "Minimize game",
         }
     }
 
@@ -145,6 +147,7 @@ impl ChaosEvents {
             ChaosEvents::FakeCrash => processes::pause_process(data.process_id, 4).await,
             ChaosEvents::RealCrash => processes::terminate_process(data.handle), // todo: pause process like fake crash before terminating
             ChaosEvents::Phoon => location::phoon(&data).await,
+            ChaosEvents::MinimizeGame => window::minimize_window(data.window_handle),
         }
     }
 

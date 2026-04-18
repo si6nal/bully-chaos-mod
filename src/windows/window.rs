@@ -2,8 +2,8 @@ use std::ffi::OsStr;
 use std::os::windows::ffi::OsStrExt;
 use log::warn;
 use windows::core::PCWSTR;
-use windows::Win32::Foundation::HWND;
-use windows::Win32::UI::WindowsAndMessaging::FindWindowW;
+use windows::Win32::Foundation::{FALSE, HWND};
+use windows::Win32::UI::WindowsAndMessaging::{FindWindowW, ShowWindow, SW_MINIMIZE};
 
 pub fn get_window_handle(title: &str) -> Option<HWND> {
     unsafe {
@@ -21,4 +21,12 @@ pub fn get_window_handle(title: &str) -> Option<HWND> {
     }
 
     None
+}
+
+pub fn minimize_window(window: HWND) {
+    unsafe {
+        if ShowWindow(window, SW_MINIMIZE) == FALSE {
+            warn!("failed to minimize window.");
+        }
+    }
 }
