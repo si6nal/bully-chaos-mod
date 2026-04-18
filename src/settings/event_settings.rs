@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub struct EventSettings {
     pub meta_no_chaos_roo: u32, // no chaos rate of occurrence
     pub meta_extra_chaos_roo: u32, // extra chaos rate of occurrence
+    // todo: combo meta event (applies an extra random event)
 }
 
 impl EventSettings {
