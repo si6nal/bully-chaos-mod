@@ -34,6 +34,8 @@ pub enum ChaosEvents {
     WantedHealth, // sets trouble meter to health (30 sec)
     RemoveWanted, // wanted level = 0
 
+    //ExtraKnockback, // checks if the player has taken damage & applies extra knockback
+
     RemoveAllAmmo, // removes all ammo
     GiveAllAmmo, // gives max ammo for weapons
 
@@ -57,6 +59,8 @@ pub enum ChaosEvents {
     ReverseGravity, // determines the current gravity & applies it oppositely (10 sec)
     Phoon, // makes the player jump (30 sec)
     OppositeInput, // applies movement in the opposite direction
+    //MapDriveBy, // teleports the player around the map in a circle, pressing space ends the circle pattern and lets the player fall (and live)
+    //OppositeMapSideTp, // teleports the player to the opposite side of the map
 
     /* ============ */
     /* INPUT EVENTS */
@@ -68,6 +72,7 @@ pub enum ChaosEvents {
     /* ================ */
     /* RENDERING EVENTS */
     /* ================ */
+    //TiredJimmy, // adds a blinking effect (30 sec)
     //RandomPicture, // choose a random picture to render in-game from a pictures folder alongside the exe, maybe make the image bounce around the screen
 
     /* ============== */
@@ -76,6 +81,7 @@ pub enum ChaosEvents {
     FakeCrash, // suspends the game for 4 seconds
     RealCrash, // closes the game
     MinimizeGame, // minimizes the game window
+    //RepeatedMinimizing, // randomly minimizes the game then maximizes it randomly (20 sec)
     //TakeYourMeds, // mutes the game (15 sec)
 }
 

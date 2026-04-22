@@ -3,7 +3,7 @@ use std::os::windows::ffi::OsStrExt;
 use log::warn;
 use windows::core::PCWSTR;
 use windows::Win32::Foundation::{FALSE, HWND};
-use windows::Win32::UI::WindowsAndMessaging::{FindWindowW, ShowWindow, SW_MINIMIZE};
+use windows::Win32::UI::WindowsAndMessaging::{FindWindowW, GetForegroundWindow, GetWindowThreadProcessId, ShowWindow, SW_MINIMIZE};
 
 pub fn get_window_handle(title: &str) -> Option<HWND> {
     unsafe {
@@ -28,5 +28,14 @@ pub fn minimize_window(window: HWND) {
         if ShowWindow(window, SW_MINIMIZE) == FALSE {
             warn!("failed to minimize window.");
         }
+    }
+}
+
+pub fn get_focused_window_process_id() -> u32 {
+    unsafe {
+        let focused_hwnd = GetForegroundWindow();
+        let mut focused_pid: u32 = 0;
+        GetWindowThreadProcessId(focused_hwnd, Some(&mut focused_pid));
+        focused_pid
     }
 }

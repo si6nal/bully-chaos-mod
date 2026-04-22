@@ -10,7 +10,7 @@ use crate::game::bully::GameData;
 use crate::game::events::{ChaosEvents, TwitchClientData};
 use crate::settings::event_settings::EventSettings;
 use crate::settings::twitch_settings::TwitchSettings;
-use crate::windows::{injection, processes};
+use crate::windows::{injection, processes, window};
 
 mod windows;
 mod game;
@@ -150,8 +150,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     _ => {} // ignore messages that aren't chat messages
                 }
             }
-
-            // todo: sleep while game isn't focused
+            
+            // check if the game is out of focus
+            if game_data.process_id != window::get_focused_window_process_id() {
+                loop {
+                    // sleep indefinitely until the game is focused again
+                    tokio::time::sleep(Duration::from_secs(1)).await;
+                    info!("game is out-of-focus, event execution paused.");
+                    
+                    // check if the game is focused
+                    if game_data.process_id != window::get_focused_window_process_id() {
+                        break;
+                    }
+                }
+            }
 
             // check if votes is empty, if so just choose a random event
             let (event, event_votes): (ChaosEvents, Option<usize>) = if votes.is_empty() {
@@ -234,5 +246,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         // warn that chaos loop exited
         warn!("Bully game handle closed.");
         let _ = client.say(twitch_settings.username.clone(), String::from("Bully game handle closed, voting paused.")).await;
+        tokio::time::sleep(Duration::from_secs(4)).await;
     }
 }
