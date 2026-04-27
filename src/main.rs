@@ -235,8 +235,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let _ = client.say(twitch_settings.username.clone(), event_msg).await;
 
             // apply other events
-            if event != ChaosEvents::FakeCrash && event != ChaosEvents::RealCrash {
-                event.execute(&game_data, Some(&twitch_client_data)).await;
+            match event {
+                ChaosEvents::FakeCrash | ChaosEvents::RealCrash => unreachable!(),
+                ChaosEvents::MetaMoreChaos => reduced_voting_timer_start = Some(Instant::now()),
+                _ => event.execute(&game_data, Some(&twitch_client_data)).await,
             }
 
             // increment event counter

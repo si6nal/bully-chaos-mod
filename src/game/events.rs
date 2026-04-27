@@ -13,9 +13,14 @@ use crate::windows::{processes, window};
 // todo: add weight to events
 #[derive(EnumIter, Clone, PartialEq, Debug)]
 pub enum ChaosEvents {
+    /* =========== */
+    /* META EVENTS */
+    /* =========== */
     Nothing, // does nothing (skips vote)
-    Nothing1Min, // does nothing for 1 minute
     RandomEvent, // selects another event
+    MetaNoChaos, // no chaos for 1 minute
+    MetaMoreChaos, // more chaos for 1 minute
+    //MetaExecutePreviousEvents, // executes the last 3 events
 
     /* ============= */
     /* MEMORY EVENTS */
@@ -59,6 +64,7 @@ pub enum ChaosEvents {
     ReverseGravity, // determines the current gravity & applies it oppositely (10 sec)
     Phoon, // makes the player jump (30 sec)
     OppositeInput, // applies movement in the opposite direction
+    //Flight, // sets z value to 25, allows x,y movement
     //MapDriveBy, // teleports the player around the map in a circle, pressing space ends the circle pattern and lets the player fall (and live)
     //OppositeMapSideTp, // teleports the player to the opposite side of the map
 
@@ -89,8 +95,9 @@ impl ChaosEvents {
     pub fn as_str(&self) -> &'static str {
         match self {
             ChaosEvents::Nothing        => "Nothing ever happens",
-            ChaosEvents::Nothing1Min    => "Nothing for 1 minute",
             ChaosEvents::RandomEvent    => "Random event",
+            ChaosEvents::MetaNoChaos    => "No chaos (meta)",
+            ChaosEvents::MetaMoreChaos  => "More chaos (meta)",
             ChaosEvents::RemoveMoney    => "Remove all money",
             ChaosEvents::CheckBounced   => "Check bounced",
             ChaosEvents::SpareChange    => "Spare change",
@@ -131,7 +138,6 @@ impl ChaosEvents {
     pub async fn execute(&self, data: &GameData, twitch_client_data: Option<&TwitchClientData>) {
         match self {
             ChaosEvents::Nothing => info!("nothing (event)"),
-            ChaosEvents::Nothing1Min => tokio::time::sleep(Duration::from_secs(60)).await,
             ChaosEvents::RandomEvent => {
                 // get all event options
                 let mut events = ChaosEvents::iter().collect::<Vec<ChaosEvents>>();
@@ -142,14 +148,22 @@ impl ChaosEvents {
                 // get random event
                 let event = ChaosEvents::rand_vec(&events);
 
-                // execute random event
-                Box::pin(event.execute(&data, None)).await;
-
                 // send message for the random event
                 if let Some(twitch_client_data) = twitch_client_data {
                     let _ = twitch_client_data.irc_client.say(twitch_client_data.channel.clone(), format!("Random event: {}", event.as_str())).await;
                 }
+
+                // execute random event
+                Box::pin(event.execute(&data, None)).await;
             },
+            ChaosEvents::MetaNoChaos => {
+                if let Some(twitch_client_data) = twitch_client_data {
+                    let _ = twitch_client_data.irc_client.say(twitch_client_data.channel.clone(), String::from("Voting disabled for 1 minute (meta).")).await;
+                }
+
+                tokio::time::sleep(Duration::from_secs(60)).await
+            },
+            ChaosEvents::MetaMoreChaos => { }, // handled in main.rs
             ChaosEvents::RemoveMoney => money::remove_money(&data),
             ChaosEvents::CheckBounced => money::check_bounced(&data),
             ChaosEvents::SpareChange => money::spare_change(&data),

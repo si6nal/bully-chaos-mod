@@ -365,6 +365,8 @@ pub async fn fake_random_tp(data: &GameData) {
     // teleport to random location
     random_tp(&data);
 
+    // todo: set location to random tp location continuously for 5 seconds to prevent some death scenarios
+
     // sleep for 5 seconds
     tokio::time::sleep(Duration::from_secs(5)).await;
 
