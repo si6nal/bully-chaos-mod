@@ -3,7 +3,7 @@ use std::os::windows::ffi::OsStrExt;
 use log::warn;
 use windows::core::PCWSTR;
 use windows::Win32::Foundation::{FALSE, HWND};
-use windows::Win32::UI::WindowsAndMessaging::{FindWindowW, GetForegroundWindow, GetWindowThreadProcessId, ShowWindow, SW_MINIMIZE};
+use windows::Win32::UI::WindowsAndMessaging::{FindWindowW, GetForegroundWindow, GetWindowThreadProcessId, ShowWindow, SW_MAXIMIZE, SW_MINIMIZE};
 
 pub fn get_window_handle(title: &str) -> Option<HWND> {
     unsafe {
@@ -26,6 +26,14 @@ pub fn get_window_handle(title: &str) -> Option<HWND> {
 pub fn minimize_window(window: HWND) {
     unsafe {
         if ShowWindow(window, SW_MINIMIZE) == FALSE {
+            warn!("failed to minimize window.");
+        }
+    }
+}
+
+pub fn maximize_window(window: HWND) {
+    unsafe {
+        if ShowWindow(window, SW_MAXIMIZE) == FALSE {
             warn!("failed to minimize window.");
         }
     }

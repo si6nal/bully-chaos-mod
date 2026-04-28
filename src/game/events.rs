@@ -83,9 +83,9 @@ pub enum ChaosEvents {
     FakeCrash, // suspends the game for 4 seconds
     RealCrash, // closes the game
     MinimizeGame, // minimizes the game window
+    RepeatedMinimizing, // randomly minimizes the game then maximizes it randomly (20 sec)
     Lag, // suspends game to mimic lag (30 sec)
     LagStutter, // briefly suspends game (30 sec)
-    //RepeatedMinimizing, // randomly minimizes the game then maximizes it randomly (20 sec)
     //TakeYourMeds, // mutes the game (15 sec)
 }
 
@@ -134,6 +134,7 @@ impl ChaosEvents {
             ChaosEvents::FakeCrash => "Fake crash",
             ChaosEvents::RealCrash => "Real crash",
             ChaosEvents::MinimizeGame => "Minimize game",
+            ChaosEvents::RepeatedMinimizing => "hackerCD (15 seconds)",
             ChaosEvents::Lag => "Favela PC (30 seconds)",
             ChaosEvents::LagStutter => "Game stutter (30 seconds)",
         }
@@ -206,6 +207,7 @@ impl ChaosEvents {
             ChaosEvents::FakeCrash => win_api::fake_crash(&data).await,
             ChaosEvents::RealCrash => win_api::real_crash(&data).await,
             ChaosEvents::MinimizeGame => win_api::minimize_game(&data).await,
+            ChaosEvents::RepeatedMinimizing => win_api::repeated_minimizing(&data).await,
             ChaosEvents::Lag => win_api::lag(&data).await,
             ChaosEvents::LagStutter => win_api::lag_stutter(&data).await,
         }

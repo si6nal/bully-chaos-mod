@@ -19,6 +19,31 @@ pub async fn minimize_game(data: &GameData) {
     window::minimize_window(data.window_handle);
 }
 
+pub async fn repeated_minimizing(data: &GameData) {
+    let start_time = Instant::now();
+    loop {
+        // check if 15 seconds has passed
+        if start_time.elapsed().as_secs() >= 15 {
+            break;
+        }
+        
+        // minimize window
+        window::minimize_window(data.window_handle);
+        
+        // wait before maximizing it
+        tokio::time::sleep(Duration::from_millis(rand::random_range(300..1000))).await;
+        
+        // maximize window
+        window::maximize_window(data.window_handle);
+        
+        // wait before minimizing the window again
+        tokio::time::sleep(Duration::from_millis(rand::random_range(1000..5000))).await;
+    }
+    
+    // make sure window is maximized
+    window::maximize_window(data.window_handle);
+}
+
 pub async fn lag(data: &GameData) {
     let start_time = Instant::now();
     loop {
