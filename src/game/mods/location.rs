@@ -1,4 +1,5 @@
 use std::time::{Duration, Instant};
+use windows::Win32::UI::Input::KeyboardAndMouse::{VK_LCONTROL, VK_LSHIFT};
 use crate::game::bully::GameData;
 use crate::game::mods::health;
 use crate::memory::coordinates_vector::CoordinatesVector;
@@ -609,6 +610,53 @@ pub async fn opposite_input(data: &GameData) {
 
         // update location
         CoordinatesVector::write(&data, new_location);
+    }
+}
+
+pub async fn flight(data: &GameData) {
+    // get current z coordinate so we can modify it
+    let mut flight_z = CoordinatesVector::read(&data).z;
+    let mut is_flying = false;
+
+    // get starting time
+    let start_time = Instant::now();
+
+    loop {
+        // check if 30 seconds has passed
+        if start_time.elapsed().as_secs() >= 30 {
+            break;
+        }
+
+        // check if we should modify z coordinate
+        if input::is_key_down(VK_LSHIFT) {
+            flight_z += 0.1f32;
+            is_flying = true;
+        } else if input::is_key_down(VK_LCONTROL) {
+            flight_z -= 0.1f32;
+            is_flying = true;
+        }
+
+        // get current coordinates
+        let mut coords = CoordinatesVector::read(&data);
+
+        // check if the player is moving for resetting flight variables or enabling flight
+        if input::is_moving() {
+            // set z coordinate to flight z if the player is changing z or has changed z
+            if is_flying {
+                // update z coordinate
+                coords.z = flight_z;
+            }
+        } else {
+            // reset flight z value
+            flight_z = coords.z;
+            is_flying = false;
+        }
+
+        // update coordinates
+        CoordinatesVector::write(&data, coords);
+
+        // sleep for cpu usage
+        tokio::time::sleep(Duration::from_millis(1)).await;
     }
 }
 

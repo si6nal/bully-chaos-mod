@@ -95,7 +95,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 //tokio::time::sleep(Duration::from_secs(5)).await;
                 //game::mods::health::update_health(&game_data, 99999999f32);
                 //game::mods::ammo::give_all_ammo(&game_data);
-                //game::mods::location::slowness(&game_data).await;
+                //game::mods::location::flight(&game_data).await;
                 //game::mods::trouble_meter::trouble_health(&game_data).await;
                 //game::mods::win_api::lag_stutter(&game_data).await;
             }

@@ -64,7 +64,7 @@ pub enum ChaosEvents {
     ReverseGravity, // determines the current gravity & applies it oppositely (10 sec)
     Phoon, // makes the player jump (30 sec)
     OppositeInput, // applies movement in the opposite direction
-    //Flight, // sets z value to 25, allows x,y movement
+    Flight, // sets z value to 25, allows x,y movement
     //MapDriveBy, // teleports the player around the map in a circle, pressing space ends the circle pattern and lets the player fall (and live)
     //OppositeMapSideTp, // teleports the player to the opposite side of the map
     //Schizophrenia, // randomly moves the character, 2-6sec input delay (30 sec)
@@ -125,6 +125,7 @@ impl ChaosEvents {
             ChaosEvents::ReverseGravity => "Reverse gravity (10 seconds)",
             ChaosEvents::Phoon          => "Phoon (30 seconds)",
             ChaosEvents::OppositeInput  => "Opposite input (30 seconds)",
+            ChaosEvents::Flight         => "Flight (30 seconds)",
             ChaosEvents::FakeCrash      => "Fake crash",
             ChaosEvents::RealCrash      => "Real crash",
             ChaosEvents::MinimizeGame   => "Minimize game",
@@ -193,6 +194,7 @@ impl ChaosEvents {
             ChaosEvents::ReverseGravity => location::reverse_gravity(&data).await,
             ChaosEvents::Phoon => location::phoon(&data).await,
             ChaosEvents::OppositeInput => location::opposite_input(&data).await,
+            ChaosEvents::Flight => location::flight(data).await,
             ChaosEvents::FakeCrash => win_api::fake_crash(&data).await,
             ChaosEvents::RealCrash => win_api::real_crash(&data).await,
             ChaosEvents::MinimizeGame => win_api::minimize_game(&data).await,
