@@ -87,6 +87,8 @@ pub enum ChaosEvents {
     FakeCrash, // suspends the game for 4 seconds
     RealCrash, // closes the game
     MinimizeGame, // minimizes the game window
+    //Lag, // suspends game to mimic lag
+    //LagStutter, // briefly suspends game
     //RepeatedMinimizing, // randomly minimizes the game then maximizes it randomly (20 sec)
     //TakeYourMeds, // mutes the game (15 sec)
 }
