@@ -660,6 +660,144 @@ pub async fn flight(data: &GameData) {
     }
 }
 
+pub async fn drunk_speed(data: &GameData) {
+    // get starting time
+    let start_time = Instant::now();
+
+    loop {
+        // check if 30 seconds has passed
+        if start_time.elapsed().as_secs() >= 30 {
+            break;
+        }
+
+        // check if the player is moving
+        if !input::is_moving() {
+            tokio::time::sleep(Duration::from_millis(5)).await;
+            continue;
+        }
+
+        // get current location
+        let current_location = CoordinatesVector::read(&data);
+
+        // sleep for difference calculation
+        tokio::time::sleep(Duration::from_millis(20)).await;
+
+        // get new location
+        let mut new_location = CoordinatesVector::read(&data);
+
+        // get displacement between locations
+        let mut displacement = current_location.get_displacement(&new_location);
+
+        // add extra x/z displacement
+        if displacement.x <= 0.0f32 {
+            displacement.x = displacement.y;
+        }
+
+        if displacement.y <= 0.0f32 {
+            displacement.y = displacement.x;
+        }
+
+        // add difference to new location
+        new_location.add(displacement);
+
+        // update location
+        CoordinatesVector::write(&data, new_location);
+    }
+}
+
+pub async fn random_force(data: &GameData) {
+    // variables for tracking forced movement
+    let mut last_input_time = Instant::now();
+    let mut xy_inverse = false;
+
+    // get starting time
+    let start_time = Instant::now();
+
+    loop {
+        // check if 30 seconds has passed
+        if start_time.elapsed().as_secs() >= 30 {
+            break;
+        }
+
+        // check if the player is moving
+        if !input::is_moving() {
+            tokio::time::sleep(Duration::from_millis(5)).await;
+            continue;
+        }
+
+        // check if we have recently added movement
+        if last_input_time.elapsed().as_millis() >= 325 {
+            // sleep
+            let sleep_time = rand::random_range(2..8);
+            tokio::time::sleep(Duration::from_secs(sleep_time)).await;
+
+            // reset last input time & flip xy inverse
+            last_input_time = Instant::now();
+            xy_inverse = !xy_inverse;
+        }
+
+        // get current location
+        let current_location = CoordinatesVector::read(&data);
+
+        // sleep for difference calculation
+        tokio::time::sleep(Duration::from_millis(20)).await;
+
+        // get new location
+        let mut new_location = CoordinatesVector::read(&data);
+
+        // get displacement between locations
+        let displacement = current_location.get_displacement(&new_location);
+
+        // move in different direction
+        if xy_inverse {
+            new_location.x -= displacement.x * 1.5f32;
+        } else {
+            new_location.y -= displacement.y * 1.5f32;
+        }
+
+        // add difference to new location
+        //new_location.subtract_horizontal(displacement);
+
+        // update location
+        CoordinatesVector::write(&data, new_location);
+    }
+}
+
+pub async fn disabled_movement_axis(data: &GameData) {
+    // choose random axis to disable
+    let disabled_axis = rand::random_range(0..2);
+
+    // get starting location
+    let starting_location = CoordinatesVector::read(&data);
+
+    // get starting time
+    let start_time = Instant::now();
+
+    loop {
+        // check if 15 seconds has passed
+        if start_time.elapsed().as_secs() >= 15 {
+            break;
+        }
+
+        // get current location
+        let mut current_location = CoordinatesVector::read(&data);
+
+        // disable axis
+        match disabled_axis {
+            0 => current_location.x = starting_location.x,
+            1 => current_location.y = starting_location.y,
+            2 => current_location.z = starting_location.z,
+            _ => unreachable!(),
+        }
+
+        // update location
+        CoordinatesVector::write(&data, current_location);
+
+        // sleep
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+}
+
 /*pub async fn get_location(data: &GameData) {
     loop {
         let coordinates = CoordinatesVector::read(data);

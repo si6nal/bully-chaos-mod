@@ -63,11 +63,13 @@ pub enum ChaosEvents {
     BusTp, // teleports to the closest bus stop
     ReverseGravity, // determines the current gravity & applies it oppositely (10 sec)
     Phoon, // makes the player jump (30 sec)
-    OppositeInput, // applies movement in the opposite direction
-    Flight, // sets z value to 25, allows x,y movement
+    OppositeInput, // applies movement in the opposite direction (30 sec)
+    Flight, // sets z value to 25, allows x,y movement (30 sec)
     //MapDriveBy, // teleports the player around the map in a circle, pressing space ends the circle pattern and lets the player fall (and live)
     //OppositeMapSideTp, // teleports the player to the opposite side of the map
-    //Schizophrenia, // randomly moves the character, 2-6sec input delay (30 sec)
+    DrunkSpeed, // speed but opposite direction (30 sec)
+    RandomForce, // randomly moves the character, 2-8sec input delay (30 sec)
+    DisabledMovementAxis, // disables a random axis the player can move along (15 sec)
 
     /* ================ */
     /* RENDERING EVENTS */
@@ -81,8 +83,8 @@ pub enum ChaosEvents {
     FakeCrash, // suspends the game for 4 seconds
     RealCrash, // closes the game
     MinimizeGame, // minimizes the game window
-    Lag, // suspends game to mimic lag
-    LagStutter, // briefly suspends game
+    Lag, // suspends game to mimic lag (30 sec)
+    LagStutter, // briefly suspends game (30 sec)
     //RepeatedMinimizing, // randomly minimizes the game then maximizes it randomly (20 sec)
     //TakeYourMeds, // mutes the game (15 sec)
 }
@@ -90,47 +92,50 @@ pub enum ChaosEvents {
 impl ChaosEvents {
     pub fn as_str(&self) -> &'static str {
         match self {
-            ChaosEvents::Nothing        => "Nothing ever happens",
-            ChaosEvents::RandomEvent    => "Random event",
-            ChaosEvents::MetaNoChaos    => "No chaos (meta)",
-            ChaosEvents::MetaMoreChaos  => "More chaos (meta)",
-            ChaosEvents::RemoveMoney    => "Remove all money",
-            ChaosEvents::CheckBounced   => "Check bounced",
-            ChaosEvents::SpareChange    => "Spare change",
-            ChaosEvents::MaxMoney       => "Max money",
-            ChaosEvents::Invincibility  => "Invincibility (30 seconds)",
-            ChaosEvents::Heal           => "Heal",
-            ChaosEvents::NoHealth       => "I need a doctor (1hp)",
-            ChaosEvents::Suicide        => "You serve zero purpose",
-            ChaosEvents::MostWanted     => "Most wanted (30 seconds)",
-            ChaosEvents::WantedHealth   => "Health is trouble (30 seconds)",
-            ChaosEvents::RemoveWanted   => "Remove trouble",
-            ChaosEvents::RemoveAllAmmo  => "Remove all ammo",
-            ChaosEvents::GiveAllAmmo    => "Give all ammo",
-            ChaosEvents::Sisyphus       => "Sisyphus (10-18 seconds)",
-            ChaosEvents::SonarSisyphus  => "Sonar Sisyphus (10-18 seconds)",
-            ChaosEvents::Speed          => "Speed (30 seconds)",
-            ChaosEvents::SpeedFaster    => "Ugandan speed (15 seconds)",
-            ChaosEvents::Slowness       => "Slowness (20 seconds)",
-            ChaosEvents::MaxJump        => "Max jump (30 seconds)",
-            ChaosEvents::NoJumping      => "No jumping (30 seconds)",
-            ChaosEvents::Freeze         => "Freeze (10 seconds)",
-            ChaosEvents::HomeSweetHome  => "Home Sweet Home",
-            ChaosEvents::RandomTp       => "Random TP",
-            ChaosEvents::FakeRandomTp   => "Fake random TP",
-            ChaosEvents::SkyTp          => "Sky TP (Suicide)",
-            ChaosEvents::FakeSkyTp      => "Fake Sky TP",
-            ChaosEvents::HellTp         => "Mole POV (Suicide)",
-            ChaosEvents::BusTp          => "BUS",
+            ChaosEvents::Nothing => "Nothing ever happens",
+            ChaosEvents::RandomEvent => "Random event",
+            ChaosEvents::MetaNoChaos => "No chaos (meta)",
+            ChaosEvents::MetaMoreChaos => "More chaos (meta)",
+            ChaosEvents::RemoveMoney => "Remove all money",
+            ChaosEvents::CheckBounced => "Check bounced",
+            ChaosEvents::SpareChange => "Spare change",
+            ChaosEvents::MaxMoney => "Max money",
+            ChaosEvents::Invincibility => "Invincibility (30 seconds)",
+            ChaosEvents::Heal => "Heal",
+            ChaosEvents::NoHealth => "I need a doctor (1hp)",
+            ChaosEvents::Suicide => "You serve zero purpose",
+            ChaosEvents::MostWanted => "Most wanted (30 seconds)",
+            ChaosEvents::WantedHealth => "Health is trouble (30 seconds)",
+            ChaosEvents::RemoveWanted  => "Remove trouble",
+            ChaosEvents::RemoveAllAmmo => "Remove all ammo",
+            ChaosEvents::GiveAllAmmo => "Give all ammo",
+            ChaosEvents::Sisyphus => "Sisyphus (10-18 seconds)",
+            ChaosEvents::SonarSisyphus => "Sonar Sisyphus (10-18 seconds)",
+            ChaosEvents::Speed => "Speed (30 seconds)",
+            ChaosEvents::SpeedFaster => "Ugandan speed (15 seconds)",
+            ChaosEvents::Slowness => "Slowness (20 seconds)",
+            ChaosEvents::MaxJump => "Max jump (30 seconds)",
+            ChaosEvents::NoJumping => "No jumping (30 seconds)",
+            ChaosEvents::Freeze => "Freeze (10 seconds)",
+            ChaosEvents::HomeSweetHome => "Home Sweet Home",
+            ChaosEvents::RandomTp => "Random TP",
+            ChaosEvents::FakeRandomTp => "Fake random TP",
+            ChaosEvents::SkyTp => "Sky TP (Suicide)",
+            ChaosEvents::FakeSkyTp => "Fake Sky TP",
+            ChaosEvents::HellTp => "Mole POV (Suicide)",
+            ChaosEvents::BusTp => "BUS",
             ChaosEvents::ReverseGravity => "Reverse gravity (10 seconds)",
-            ChaosEvents::Phoon          => "Phoon (30 seconds)",
-            ChaosEvents::OppositeInput  => "Opposite input (30 seconds)",
-            ChaosEvents::Flight         => "Flight (30 seconds)",
-            ChaosEvents::FakeCrash      => "Fake crash",
-            ChaosEvents::RealCrash      => "Real crash",
-            ChaosEvents::MinimizeGame   => "Minimize game",
-            ChaosEvents::Lag            => "Favela PC (30 seconds)",
-            ChaosEvents::LagStutter     => "Game stutter (30 seconds)",
+            ChaosEvents::Phoon => "Phoon (30 seconds)",
+            ChaosEvents::OppositeInput => "Opposite input (30 seconds)",
+            ChaosEvents::Flight => "Flight (30 seconds)",
+            ChaosEvents::DrunkSpeed => "Drunk speed (30 seconds)",
+            ChaosEvents::RandomForce => "Random force (30 seconds)",
+            ChaosEvents::DisabledMovementAxis => "Disable random axis (30 seconds)",
+            ChaosEvents::FakeCrash => "Fake crash",
+            ChaosEvents::RealCrash => "Real crash",
+            ChaosEvents::MinimizeGame => "Minimize game",
+            ChaosEvents::Lag => "Favela PC (30 seconds)",
+            ChaosEvents::LagStutter => "Game stutter (30 seconds)",
         }
     }
 
@@ -194,7 +199,10 @@ impl ChaosEvents {
             ChaosEvents::ReverseGravity => location::reverse_gravity(&data).await,
             ChaosEvents::Phoon => location::phoon(&data).await,
             ChaosEvents::OppositeInput => location::opposite_input(&data).await,
-            ChaosEvents::Flight => location::flight(data).await,
+            ChaosEvents::Flight => location::flight(&data).await,
+            ChaosEvents::DrunkSpeed => location::drunk_speed(&data).await,
+            ChaosEvents::RandomForce => location::random_force(&data).await,
+            ChaosEvents::DisabledMovementAxis => location::disabled_movement_axis(&data).await,
             ChaosEvents::FakeCrash => win_api::fake_crash(&data).await,
             ChaosEvents::RealCrash => win_api::real_crash(&data).await,
             ChaosEvents::MinimizeGame => win_api::minimize_game(&data).await,
