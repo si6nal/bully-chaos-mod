@@ -124,7 +124,7 @@ pub fn open_process(process_id: u32) -> Option<HANDLE> {
     }
 }
 
-pub async fn pause_process(process_id: u32, pause_secs: u64) {
+pub async fn pause_process(process_id: u32, pause_ms: u64) {
     unsafe {
         // create snapshot of current threads
         match CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0) {
@@ -157,7 +157,7 @@ pub async fn pause_process(process_id: u32, pause_secs: u64) {
                         if let Ok(thread_handle) = OpenThread(THREAD_ALL_ACCESS, false, thread_entry.th32ThreadID) {
                             // suspend thread, sleep, resume & close handle to thread
                             SuspendThread(thread_handle);
-                            tokio::time::sleep(Duration::from_secs(pause_secs)).await;
+                            tokio::time::sleep(Duration::from_millis(pause_ms)).await;
                             ResumeThread(thread_handle);
                             let _ = CloseHandle(thread_handle);
                         }

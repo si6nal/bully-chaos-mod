@@ -6,7 +6,7 @@ use strum_macros::EnumIter;
 use twitch_irc::{SecureTCPTransport, TwitchIRCClient};
 use twitch_irc::login::StaticLoginCredentials;
 use crate::game::bully::GameData;
-use crate::game::mods::{ammo, health, location, money, trouble_meter};
+use crate::game::mods::{ammo, health, location, money, trouble_meter, win_api};
 use crate::windows::{processes, window};
 
 // events that are commented out aren't implemented
@@ -67,13 +67,7 @@ pub enum ChaosEvents {
     //Flight, // sets z value to 25, allows x,y movement
     //MapDriveBy, // teleports the player around the map in a circle, pressing space ends the circle pattern and lets the player fall (and live)
     //OppositeMapSideTp, // teleports the player to the opposite side of the map
-
-    /* ============ */
-    /* INPUT EVENTS */
-    /* ============ */
-    //Schizophrenia, // randomly presses movement keys & moves the mouse, 2-6sec input delay (30 sec)
-    //CameraSpin, // sends mouse movement messages to rotate the camera (20 sec)
-    //ConstantAttacking, // sends key presses to attack (15 sec)
+    //Schizophrenia, // randomly moves the character, 2-6sec input delay (30 sec)
 
     /* ================ */
     /* RENDERING EVENTS */
@@ -87,8 +81,8 @@ pub enum ChaosEvents {
     FakeCrash, // suspends the game for 4 seconds
     RealCrash, // closes the game
     MinimizeGame, // minimizes the game window
-    //Lag, // suspends game to mimic lag
-    //LagStutter, // briefly suspends game
+    Lag, // suspends game to mimic lag
+    LagStutter, // briefly suspends game
     //RepeatedMinimizing, // randomly minimizes the game then maximizes it randomly (20 sec)
     //TakeYourMeds, // mutes the game (15 sec)
 }
@@ -134,6 +128,8 @@ impl ChaosEvents {
             ChaosEvents::FakeCrash      => "Fake crash",
             ChaosEvents::RealCrash      => "Real crash",
             ChaosEvents::MinimizeGame   => "Minimize game",
+            ChaosEvents::Lag            => "Favela PC (30 seconds)",
+            ChaosEvents::LagStutter     => "Game stutter (30 seconds)",
         }
     }
 
@@ -197,15 +193,11 @@ impl ChaosEvents {
             ChaosEvents::ReverseGravity => location::reverse_gravity(&data).await,
             ChaosEvents::Phoon => location::phoon(&data).await,
             ChaosEvents::OppositeInput => location::opposite_input(&data).await,
-            ChaosEvents::FakeCrash => processes::pause_process(data.process_id, 4).await,
-            ChaosEvents::RealCrash => {
-                // pause process (fake crash)
-                processes::pause_process(data.process_id, 4).await;
-
-                // "crash" (close) process
-                processes::terminate_process(data.handle)
-            },
-            ChaosEvents::MinimizeGame => window::minimize_window(data.window_handle),
+            ChaosEvents::FakeCrash => win_api::fake_crash(&data).await,
+            ChaosEvents::RealCrash => win_api::real_crash(&data).await,
+            ChaosEvents::MinimizeGame => win_api::minimize_game(&data).await,
+            ChaosEvents::Lag => win_api::lag(&data).await,
+            ChaosEvents::LagStutter => win_api::lag_stutter(&data).await,
         }
     }
 

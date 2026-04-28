@@ -97,6 +97,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 //game::mods::ammo::give_all_ammo(&game_data);
                 //game::mods::location::slowness(&game_data).await;
                 //game::mods::trouble_meter::trouble_health(&game_data).await;
+                //game::mods::win_api::lag_stutter(&game_data).await;
             }
 
             // check if we should apply the reduced voting timer
