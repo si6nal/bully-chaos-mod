@@ -7,7 +7,6 @@ use twitch_irc::{SecureTCPTransport, TwitchIRCClient};
 use twitch_irc::login::StaticLoginCredentials;
 use crate::game::bully::GameData;
 use crate::game::mods::{ammo, health, location, money, trouble_meter, win_api};
-use crate::windows::{processes, window};
 
 // events that are commented out aren't implemented
 // todo: add weight to events
@@ -216,10 +215,10 @@ impl ChaosEvents {
         }
     }
 
-    pub fn rand() -> ChaosEvents {
+    /*pub fn rand() -> ChaosEvents {
         let mut rng = rand::rng();
         ChaosEvents::iter().choose(&mut rng).unwrap_or(ChaosEvents::Nothing)
-    }
+    }*/
 
     pub fn rand_vec(events: &Vec<ChaosEvents>) -> ChaosEvents {
         let mut rng = rand::rng();
