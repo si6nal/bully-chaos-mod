@@ -76,6 +76,9 @@ pub enum ChaosEvents {
     /* ================ */
     //TiredJimmy, // adds a blinking effect (30 sec)
     //RandomPicture, // choose a random picture to render in-game from a pictures folder alongside the exe, maybe make the image bounce around the screen
+    //FlippedGame, // flips the window
+    //InverseColors, // inverses window colors
+    //RemoveRandomScreenPart, // hides a random part of the window
 
     /* ============== */
     /* WINDOWS EVENTS */
