@@ -114,7 +114,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let _ = client.say(twitch_settings.username.clone(), String::from("More chaos disabled.")).await;
                 }
 
-                voting_time.div(2)
+                voting_time.div(3)
             } else {
                 voting_time
             };
