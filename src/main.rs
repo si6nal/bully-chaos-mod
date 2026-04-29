@@ -230,7 +230,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             // apply other events
             match event {
-                ChaosEvents::FakeCrash | ChaosEvents::RealCrash => unreachable!(),
+                ChaosEvents::FakeCrash | ChaosEvents::RealCrash => { },
                 ChaosEvents::MetaMoreChaos => reduced_voting_timer_start = Some(Instant::now()),
                 _ => event.execute(&game_data, Some(&twitch_client_data)).await,
             }
